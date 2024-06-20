@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.U2D;
 using UnityEngine.UIElements;
 
 enum Side: int
@@ -18,17 +18,18 @@ public class PuzzleGeneration : MonoBehaviour
     [SerializeField] private Texture2D mask;
     [SerializeField] private Texture2D image;
     [SerializeField] private GameObject puzzle_prefab;
+    [SerializeField] private List<GameObject> puzzles;
+    [SerializeField] private int offset;
 
-    //private Color[] image_pixels;
+    private Vector2 image_offset = new Vector2 (6,3);
     private Texture2D mask_copy;
     private int[,] segments_marking;
     private List<RectInt> puzzle_shapes;
-
-    [SerializeField] private List<GameObject> puzzles;
-    
+ 
     private void Start()
     {
         int segement_number = 1;
+        int number_of_segments_to_generate = 3;
 
         mask_copy = ChangeFormat(mask, TextureFormat.ARGB32);
         mask_copy.filterMode = FilterMode.Point;
@@ -36,8 +37,6 @@ public class PuzzleGeneration : MonoBehaviour
         // initializing array of puzzle indexes, and shapes of puzzles
         segments_marking = new int[mask_copy.width, mask_copy.height];
         puzzle_shapes = new List<RectInt>();
-
-       
 
         for (int i = 0; i < mask.width; i++)
         {
@@ -48,12 +47,13 @@ public class PuzzleGeneration : MonoBehaviour
                     var temp = SelectSegment(mask_copy, i, j, Color.black, segement_number);
                     puzzle_shapes.Add(temp);
                     StartCoroutine(CreatePuzzle(temp, segement_number));
-                    segement_number += 1;                
+                    segement_number += 1; 
+                    
+                    //if (segement_number > number_of_segments_to_generate) goto end_of_cycle;                 
                 }
             }
         }
-
-        int offset = 3;
+        //end_of_cycle:
 
         for (int j = 1; j < mask_copy.height; j += offset)
         {
@@ -67,6 +67,9 @@ public class PuzzleGeneration : MonoBehaviour
 
 
         print("generation time = " + Time.realtimeSinceStartup);
+
+        ShufflePuzzles();
+
         gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(mask_copy,
                                                                         new Rect(0, 0, mask_copy.width, mask_copy.height),
                                                                         new Vector2(.5f, .5f));
@@ -90,12 +93,26 @@ public class PuzzleGeneration : MonoBehaviour
         var data_1 = puzzles[puzzle_index_1 - 1].GetComponent<PuzzlePiece>();
         var data_2 = puzzles[puzzle_index_2 - 1].GetComponent<PuzzlePiece>();
 
-        data_1.Add_neighbour(puzzle_index_2, data_2.transform.position);
-        data_2.Add_neighbour(puzzle_index_1, data_1.transform.position);
+        //data_1.Add_neighbour(puzzle_index_2, data_2.GetCenter() - data_1.GetCenter());
+        //data_2.Add_neighbour(puzzle_index_1, data_1.GetCenter() - data_2.GetCenter());
+        data_1.Add_neighbour(puzzle_index_2, data_2.GetCenter(), data_2.GetCollider());
+        data_2.Add_neighbour(puzzle_index_1, data_1.GetCenter(), data_1.GetCollider());
     }
+
+    private void ShufflePuzzles() 
+    {
+        foreach (var t in puzzles)
+        {
+            Vector2 random_pos = new Vector2(UnityEngine.Random.Range(0, 6), UnityEngine.Random.Range(-2, 2));
+
+            t.GetComponent<PuzzlePiece>().MovePuzzle(random_pos);
+        }
+    }
+
 
     IEnumerator CheckLine(int index, int length, bool isRow)
     {
+        //yield return new WaitForSeconds(1);
         int last_index = 0;
         bool was_zero = false;
         for (int i = 0; i < length; i++)
@@ -120,10 +137,6 @@ public class PuzzleGeneration : MonoBehaviour
         }
         yield return null;
     }
-
-   
-
-
 
     IEnumerator CreatePuzzle(RectInt s, int segment_index)
     {
@@ -152,14 +165,34 @@ public class PuzzleGeneration : MonoBehaviour
                 }
             }
         }
-
         temp.Apply();
 
-        puzzle_prefab.GetComponent<PuzzlePiece>().SetIndex(segment_index);
-        var sr = puzzle_prefab.GetComponent<SpriteRenderer>();
-        sr.sprite = Sprite.Create(temp, new Rect(0, 0, temp.width, temp.height), new Vector2(.5f, .5f));
-        puzzles.Add(Instantiate(puzzle_prefab,new Vector2(UnityEngine.Random.Range(-6,6), UnityEngine.Random.Range(-4, 4)),Quaternion.identity,gameObject.transform));
+        Vector2 place = new Vector2(s.xMax + s.xMin, s.yMax + s.yMin) / 200 - image_offset;
 
+        
+
+        var obj = Instantiate(puzzle_prefab, place, Quaternion.identity, gameObject.transform);
+        puzzles.Add(obj);
+
+
+        var pp = obj.GetComponent<PuzzlePiece>();
+        var sr = obj.GetComponent<SpriteRenderer>();
+
+        pp.SetIndex(segment_index);
+        pp.SetCenter(place);
+        sr.sprite = Sprite.Create(temp, new Rect(0, 0, temp.width, temp.height), new Vector2(.5f, .5f));
+
+        StartCoroutine(UpdateShapeToSprite(obj));
+
+        yield return null;
+    }
+
+
+    private IEnumerator UpdateShapeToSprite(GameObject obj)
+    {
+        Destroy(obj.GetComponent<PolygonCollider2D>(), 1);
+        var t = obj.AddComponent<PolygonCollider2D>();
+        obj.GetComponent<PuzzlePiece>().Set_collider(t);
         yield return null;
     }
 
@@ -172,7 +205,10 @@ public class PuzzleGeneration : MonoBehaviour
         var PixelQueue = new Queue<Tuple<int, int>>();
         PixelQueue.Enqueue(Tuple.Create<int, int>(x, y));
 
-
+        bool CloseToWhite(Color c)
+        {
+            return c.b + c.g + c.r > 2.8;
+        }
         //procedure which adds pixels at the top or the botom of <x,y> pixel (depends of <offset>) to the queue
         //<was_white> flag is necessary to avoid adding extra pixels to the queue 
         void AddPixelsToQueue(int x, int y, ref bool was_white,int offset)
@@ -240,8 +276,5 @@ public class PuzzleGeneration : MonoBehaviour
         return res;
     }
 
-    private bool CloseToWhite(Color c) 
-    {
-        return c.b + c.g + c.r > 2.8;
-    }
+    
 }

@@ -134,10 +134,9 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
-  - component: {fileID: 519420033}
   - component: {fileID: 519420035}
   - component: {fileID: 519420034}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -262,22 +261,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &519420033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56666c5a40171f54783dd416a44f42bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EventMask:
-    serializedVersion: 2
-    m_Bits: 128
-  m_MaxRayIntersections: 2
 --- !u!58 &519420034
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -285,28 +268,28 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 55
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   m_ForceReceiveLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_ContactCaptureLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   m_CallbackLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -325,6 +308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7d88c899b468b947b10e28260c32f6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  holded_puzzle: {fileID: 0}
 --- !u!1 &953581223
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,7 +320,7 @@ GameObject:
   - component: {fileID: 953581225}
   - component: {fileID: 953581224}
   - component: {fileID: 953581226}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: GameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -355,10 +339,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaab1d21049dd804580569e37f948191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mask: {fileID: 2800000, guid: 87cf9ebeabce3614d86e4d6386d9ced9, type: 3}
-  image: {fileID: 2800000, guid: 3bf5dfdb74b7fa34eaf9573604f3da71, type: 3}
-  puzzle_prefab: {fileID: 6258371073052359142, guid: cd3cc425d7be74d41947b6395bc073e8, type: 3}
+  mask: {fileID: 2800000, guid: cac4a741895abb84e80fea096d6b700d, type: 3}
+  image: {fileID: 2800000, guid: f97d6cc58e4f3b34ab59a7d5b69d29fb, type: 3}
+  puzzle_prefab: {fileID: 6258371073052359142, guid: 1f3c77fd064f2c64aac98badfdf2a598, type: 3}
   puzzles: []
+  offset: 4
 --- !u!4 &953581225
 Transform:
   m_ObjectHideFlags: 0
