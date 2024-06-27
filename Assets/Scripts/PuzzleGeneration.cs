@@ -93,8 +93,6 @@ public class PuzzleGeneration : MonoBehaviour
         var data_1 = puzzles[puzzle_index_1 - 1].GetComponent<PuzzlePiece>();
         var data_2 = puzzles[puzzle_index_2 - 1].GetComponent<PuzzlePiece>();
 
-        //data_1.Add_neighbour(puzzle_index_2, data_2.GetCenter() - data_1.GetCenter());
-        //data_2.Add_neighbour(puzzle_index_1, data_1.GetCenter() - data_2.GetCenter());
         data_1.Add_neighbour(puzzle_index_2, data_2.GetCenter(), data_2.GetCollider());
         data_2.Add_neighbour(puzzle_index_1, data_1.GetCenter(), data_1.GetCollider());
     }
@@ -104,7 +102,6 @@ public class PuzzleGeneration : MonoBehaviour
         foreach (var t in puzzles)
         {
             Vector2 random_pos = new Vector2(UnityEngine.Random.Range(0, 6), UnityEngine.Random.Range(-2, 2));
-
             t.GetComponent<PuzzlePiece>().MovePuzzle(random_pos);
         }
     }

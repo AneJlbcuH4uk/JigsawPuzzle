@@ -59,20 +59,19 @@ public class CameraControl : MonoBehaviour
         {
             gameObject.transform.position += (Vector3)((Vector2)Input.mousePosition - lastScreenSize / 2).normalized * speed * Time.deltaTime;
         }
-        //print(IsCursorAtTheBorder());
     }
 
-    private void OnDrawGizmos()
-    {
-        if (instance != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(camera_border_width, 0, 0)), camera.ScreenToWorldPoint(new Vector3(camera_border_width, lastScreenSize.y, 0)));
-            Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x - camera_border_width, 0, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x - camera_border_width, lastScreenSize.y, 0)));
-            Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(0, camera_border_width, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x, camera_border_width, 0)));
-            Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(0, lastScreenSize.y - camera_border_width, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x, lastScreenSize.y - camera_border_width, 0)));
-        }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    if (instance != null)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(camera_border_width, 0, 0)), camera.ScreenToWorldPoint(new Vector3(camera_border_width, lastScreenSize.y, 0)));
+    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x - camera_border_width, 0, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x - camera_border_width, lastScreenSize.y, 0)));
+    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(0, camera_border_width, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x, camera_border_width, 0)));
+    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(0, lastScreenSize.y - camera_border_width, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x, lastScreenSize.y - camera_border_width, 0)));
+    //    }
+    //}
 
     private void FixedUpdate()
     {
@@ -87,7 +86,7 @@ public class CameraControl : MonoBehaviour
 
     private bool IsCursorAtTheBorder() 
     {
-        return false;
+        //return false;
         return Input.mousePosition.x < camera_border_width ||
                Input.mousePosition.x > lastScreenSize.x - camera_border_width ||
                Input.mousePosition.y < camera_border_width ||
