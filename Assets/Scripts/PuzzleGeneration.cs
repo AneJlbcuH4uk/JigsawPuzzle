@@ -15,14 +15,15 @@ enum Side: int
 
 public class PuzzleGeneration : MonoBehaviour
 {
-    [SerializeField] private Texture2D mask;
     [SerializeField] private Texture2D image;
     [SerializeField] private GameObject puzzle_prefab;
     [SerializeField] private List<GameObject> puzzles;
     [SerializeField] private int offset;
+    [SerializeField] private int cock;
+    [SerializeField] private MaskType mask_type;
 
     private Vector2 image_offset = new Vector2 (6,3);
-    private Texture2D mask_copy;
+    private Texture2D mask;
     private int[,] segments_marking;
     private List<RectInt> puzzle_shapes;
  
@@ -30,21 +31,22 @@ public class PuzzleGeneration : MonoBehaviour
     {
         int segement_number = 1;
         int number_of_segments_to_generate = 3;
-
-        mask_copy = ChangeFormat(mask, TextureFormat.ARGB32);
-        mask_copy.filterMode = FilterMode.Point;
+        var mg = new MaskGenerator(new Vector2Int(image.width, image.height), cock, mask_type);
+        //mask = ChangeFormat(mask, TextureFormat.ARGB32);
+        mask = mg.GetMask();
+        mask.filterMode = FilterMode.Point;
       
         // initializing array of puzzle indexes, and shapes of puzzles
-        segments_marking = new int[mask_copy.width, mask_copy.height];
+        segments_marking = new int[mask.width, mask.height];
         puzzle_shapes = new List<RectInt>();
 
         for (int i = 0; i < mask.width; i++)
         {
             for (int j = 0; j < mask.height; j++)
             {
-                if (mask_copy.GetPixel(i, j) == Color.white)
+                if (mask.GetPixel(i, j) == Color.white)
                 {
-                    var temp = SelectSegment(mask_copy, i, j, Color.black, segement_number);
+                    var temp = SelectSegment(mask, i, j, Color.black, segement_number);
                     puzzle_shapes.Add(temp);
                     StartCoroutine(CreatePuzzle(temp, segement_number));
                     segement_number += 1; 
@@ -55,14 +57,14 @@ public class PuzzleGeneration : MonoBehaviour
         }
         //end_of_cycle:
         //print();
-        for (int j = 1; j < mask_copy.height; j += offset)
+        for (int j = 1; j < mask.height; j += offset)
         {
-            StartCoroutine(CheckLine(j, mask_copy.width,true));
+            StartCoroutine(CheckLine(j, mask.width,true));
         }
 
-        for (int j = 1; j < mask_copy.width; j += offset)
+        for (int j = 1; j < mask.width; j += offset)
         {
-            StartCoroutine(CheckLine(j, mask_copy.height,false));
+            StartCoroutine(CheckLine(j, mask.height,false));
         }
 
 
@@ -70,13 +72,13 @@ public class PuzzleGeneration : MonoBehaviour
 
         ShufflePuzzles();
 
-        gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(mask_copy,
-                                                                        new Rect(0, 0, mask_copy.width, mask_copy.height),
+        gameObject.GetComponent<SpriteRenderer>().sprite = Sprite.Create(mask,
+                                                                        new Rect(0, 0, mask.width, mask.height),
                                                                         new Vector2(.5f, .5f));
     }
 
 
-    public Texture2D ChangeFormat(Texture2D oldTexture, TextureFormat newFormat)
+    public static Texture2D ChangeFormat(Texture2D oldTexture, TextureFormat newFormat)
     {
         //Create new empty Texture
         Texture2D newTex = new Texture2D(oldTexture.width, oldTexture.height, newFormat, false);
@@ -112,12 +114,13 @@ public class PuzzleGeneration : MonoBehaviour
         //yield return new WaitForSeconds(1);
         int last_index = 0;
         bool was_zero = false;
+        int last_zero = 0;
         for (int i = 0; i < length; i++)
         {
             int value = isRow ? segments_marking[i, index] : segments_marking[index, i];
             if (value != 0)
             {
-                if (was_zero)
+                if (was_zero && i - last_zero < 5)
                 {
                     if (last_index != 0 && last_index != value)
                     {
@@ -129,6 +132,8 @@ public class PuzzleGeneration : MonoBehaviour
             }
             else
             {
+                if (!was_zero)
+                    last_zero = i;
                 was_zero = true;
             }
         }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7013389729750432407}
   - component: {fileID: 1691573376122876954}
   - component: {fileID: 2877976175687732607}
+  - component: {fileID: 4181893761185440436}
   m_Layer: 5
   m_Name: Journal
   m_TagString: Untagged
@@ -120,7 +121,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7013389729750432407}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2877976175687732607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,3 +146,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fabb632598808c54eb582c5d9f3f3fd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4181893761185440436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3088904014367123728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d9c50f53f886f746aa15d04b0097fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  oldUIpos: {x: 0, y: 0}

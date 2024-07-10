@@ -11,9 +11,10 @@ public class UIBehaviour : MonoBehaviour
 {
     [SerializeField] private Image PanelJournalHolder;
     [SerializeField] private Image MainMenuButtonHolder;
-    [SerializeField] private GameObject Journal;
+    [SerializeField] private GameObject Journal_pref;
     [SerializeField] private GameObject ButtonNext;
     [SerializeField] private GameObject ButtonPrev;
+    [SerializeField] private GameObject ButtonClose;
     [SerializeField] private int number_of_journals;
 
     private WaitForFixedUpdate _waitForFixedUpdate = new WaitForFixedUpdate();
@@ -21,8 +22,10 @@ public class UIBehaviour : MonoBehaviour
     private float _delta_for_1_sec_anim;
     private List<GameObject> Journals;
     private int _cur_journal_page = 0;
-    [SerializeField] private int number_of_journal_pages;
+    private int number_of_journal_pages;
     private Vector2[] deff_positions = new Vector2[8];
+    [SerializeField] private GameObject Opened_Journal = null;
+
 
     private void Start()
     {
@@ -40,11 +43,14 @@ public class UIBehaviour : MonoBehaviour
 
         for (int i = 0; i < number_of_journals; i++) 
         {
-            Journals.Add(Instantiate(Journal, PanelJournalHolder.transform.Find("JournalHolder").transform));
+            Journals.Add(Instantiate(Journal_pref, PanelJournalHolder.transform.Find("JournalHolder").transform));
         }
 
         for (int i = 0; i < number_of_journals; i++)
         {
+            var b = Journals[i].GetComponent<Button>();
+            b.onClick.AddListener(OnClickJournalButton);
+
             var t = Journals[i].GetComponent<RectTransform>();
             t.rotation = Quaternion.Euler(0,0, Random.Range(-15,15));
             t.gameObject.SetActive(false);
@@ -81,6 +87,7 @@ public class UIBehaviour : MonoBehaviour
                 Journals[i].SetActive(true);
                 Vector2 dir = deff_positions[i % 8] - Journals[i].GetComponent<RectTransform>().anchoredPosition;
                 StartCoroutine(MoveImage(dir, Journals[i].GetComponent<Image>(), 0.5f));
+                Journals[i].GetComponent<UIJournalData>().ClearData();
             }
         }
 
@@ -98,8 +105,10 @@ public class UIBehaviour : MonoBehaviour
         StartCoroutine(MoveImage(Vector2.down * 1080, MainMenuButtonHolder, 0.25f));
 
         for (int i = _cur_journal_page * 8; i < _cur_journal_page * 8 + 8 && i < number_of_journals; i++)
-        {       
-            StartCoroutine(MoveImage(-deff_positions[i%8], Journals[i].GetComponent<Image>(), 0.25f,true));
+        {
+            StartCoroutine(MoveImage(-Journals[i].GetComponent<RectTransform>().anchoredPosition, Journals[i].GetComponent<Image>(), 0.25f,true));
+            StartCoroutine(RotateImage(Journals[i].GetComponent<UIJournalData>().GetAngle(), Journals[i].GetComponent<Image>(), 0.5f));
+            Journals[i].GetComponent<UIJournalData>().ClearData();
         }
     }
 
@@ -118,11 +127,13 @@ public class UIBehaviour : MonoBehaviour
         {
             Journals[i].SetActive(true);
             StartCoroutine(MoveImage(deff_positions[i%8], Journals[i].GetComponent<Image>(), 0.5f));
+            Journals[i].GetComponent<UIJournalData>().ClearData();
         }
     }
 
     private IEnumerator MoveImage(Vector2 direction, Image UIelement, float duration, bool deactivate = false) {
-        
+
+        //print("move to " + direction);
         float _current_scale = gameObject.GetComponent<RectTransform>().localScale.y;
         float number_of_sim_steps = 50 * duration;
         for (int i = 0; i < number_of_sim_steps; i++)
@@ -135,9 +146,54 @@ public class UIBehaviour : MonoBehaviour
             UIelement.gameObject.SetActive(false);
     }
 
+    private IEnumerator RotateImage(float rotation, Image UIelement, float duration, bool deactivate = false) 
+    {     
+        float number_of_sim_steps = 50 * duration;
+        //print("trying rotate journal by " + rotation + " degrees");
+        for (int i = 0; i < number_of_sim_steps; i++)
+        {
+            //print(Quaternion.Euler(0, 0, rotation * _delta_for_1_sec_anim * (1 / duration)));
+            UIelement.gameObject.GetComponent<RectTransform>().rotation *= Quaternion.AngleAxis( rotation * _delta_for_1_sec_anim * (1 / duration), Vector3.forward);
+            yield return _waitForFixedUpdate;
+        }
 
+        if (deactivate)
+            UIelement.gameObject.SetActive(false);
+    }
+    
+
+    public void OnClickJournalButton() 
+    {
+        ButtonClose.SetActive(true);
+        Opened_Journal = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        var jd = Opened_Journal.GetComponent<UIJournalData>();
+        jd.UpdateData();
+
+        //Opened_Journal.transform.position += Vector3.forward;
+        Vector2 centerOfScreen = new Vector2(0, -1080)/2;
+        StartCoroutine(MoveImage(centerOfScreen - Opened_Journal.GetComponent<RectTransform>().anchoredPosition, Opened_Journal.GetComponent<Image>(), 0.2f));
+
+        float angle = - Opened_Journal.GetComponent<RectTransform>().rotation.eulerAngles.z;
+        angle = Mathf.Abs(angle) > 180 ? angle = 360 + angle : angle;
+        StartCoroutine(RotateImage(angle, Opened_Journal.GetComponent<Image>(), 0.25f));
+
+    }
+
+    public void OnClickButtonClose() 
+    {
+        ButtonClose.SetActive(false);
+        var jd = Opened_Journal.GetComponent<UIJournalData>();
+        StartCoroutine(MoveImage(jd.GetPos() - Opened_Journal.GetComponent<RectTransform>().anchoredPosition, Opened_Journal.GetComponent<Image>(), 0.2f));
+        StartCoroutine(RotateImage(jd.GetAngle(), Opened_Journal.GetComponent<Image>(), 0.25f));
+
+        //jd.ClearData();
+        Opened_Journal = null;         
+        //Opened_Journal.transform.position += Vector3.back;
+
+    }
 
     
+
 
     
 

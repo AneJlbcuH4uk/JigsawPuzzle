@@ -8,9 +8,10 @@ using UnityEngine;
 public class ConnectionPoint
 {
     [SerializeField] private int puzzle_index;
-    private Vector2 releative_position;
     [SerializeField] private Collider2D collider_ref;
 
+    private Vector2 releative_position;
+  
     public ConnectionPoint(int index, Vector2 pos, Collider2D colref)
     {
         this.puzzle_index = index;

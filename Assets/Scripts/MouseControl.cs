@@ -13,7 +13,6 @@ public sealed class MouseControl : MonoBehaviour
     private static MouseControl instance;
     private Collider2D force_field;
 
-
     public static MouseControl GetInstance() 
     {
         if (instance == null) 

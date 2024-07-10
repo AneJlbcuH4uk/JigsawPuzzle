@@ -229,6 +229,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   camera_border_width: 20
+  scale: 0.2
 --- !u!114 &519420037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -354,11 +355,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaab1d21049dd804580569e37f948191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mask: {fileID: 2800000, guid: 76a3b11739624de4c9763b3ff69a0d08, type: 3}
   image: {fileID: 2800000, guid: f97d6cc58e4f3b34ab59a7d5b69d29fb, type: 3}
   puzzle_prefab: {fileID: 6258371073052359142, guid: 1f3c77fd064f2c64aac98badfdf2a598, type: 3}
   puzzles: []
-  offset: 10
+  offset: 1
+  cock: 5
+  mask_type: 0
 --- !u!4 &953581225
 Transform:
   m_ObjectHideFlags: 0
