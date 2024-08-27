@@ -9,8 +9,9 @@ public class UIJournalData : MonoBehaviour
     
     [SerializeField] private Vector2 oldUIpos;
     [SerializeField] private float oldUIRot;
+    [SerializeField] private JournalData puzzle_images_path;
 
-    private void Awake()
+    private void Start()
     {
         oldUIpos = Vector2.zero;
     }
@@ -21,10 +22,14 @@ public class UIJournalData : MonoBehaviour
         {
             oldUIpos = gameObject.GetComponent<RectTransform>().anchoredPosition;
             oldUIRot = gameObject.transform.rotation.eulerAngles.z;
-            oldUIRot = Mathf.Abs(oldUIRot) > 180 ? oldUIRot = 360 - oldUIRot : oldUIRot;
+            oldUIRot = Mathf.Abs(oldUIRot) > 180 ? oldUIRot =  oldUIRot - 360 : oldUIRot;
         }
     }
 
+    public void SetImagesPath(string path) 
+    {
+        puzzle_images_path = new JournalData(path);
+    }
   
 
     public void ClearData() 
@@ -33,6 +38,10 @@ public class UIJournalData : MonoBehaviour
         oldUIpos = Vector2.zero;
     }
 
+    public PuzzleData[] GetPage(int p) => puzzle_images_path.GetPage(p);
+
     public float GetAngle() => oldUIRot;
     public Vector2 GetPos() => oldUIpos;
+
+    public int GetNumberOfPages() => puzzle_images_path.GetNumberOfPages();
 }

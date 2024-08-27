@@ -56,11 +56,14 @@ public sealed class MouseControl : MonoBehaviour
     public void SetHoldedPuzzle(PuzzlePiece p) 
     {
         holded_puzzle = p;
+        holded_puzzle.MoveToTop();
     }
 
     public void UnsetHoldedPuzzle() 
     {
-        holded_puzzle = null;
+        if (holded_puzzle != null)
+            holded_puzzle.MoveToBottom();
+        holded_puzzle = null;     
     }
 
     public bool Is_holding() 

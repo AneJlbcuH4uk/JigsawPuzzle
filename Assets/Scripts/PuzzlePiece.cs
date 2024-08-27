@@ -11,7 +11,7 @@ public class PuzzlePiece : MonoBehaviour
     [SerializeField] private static float magnet_distance = 0.2f;           // distance of puzzle magnet
 
     private static MouseControl MC_ref = MouseControl.GetInstance();        // reference to MouseControl sript instance
-    private static Color hover_light = new Color(0.0f, 0.0f, 0.0f, 0.3f);   // fade collor
+    private static Color hover_light = new Color(0.0f, 0.0f, 0.0f, 0.4f);   // fade collor
 
     [SerializeField] private int index;                 // index of puzzle used in puzzle comparisons
     private Vector2 center;                             // sprite center of puzzle
@@ -19,18 +19,19 @@ public class PuzzlePiece : MonoBehaviour
     private Collider2D collision;                       // collider of puzzle used in OnMouseEnter, OnMouseExit .... 
     
     private SpriteRenderer SR_ref;                      // sprite renderer of puzzle keeps cropped image in form of puzzle
-   
+
     //variables used in detection of neighbours 
     private bool Is_loocking_for_neighbours = false;    // if holding puzzle with neighbours in list
     private bool Is_magneting = false;                  // if current holded puzzle is magneted
     private ConnectionPoint closest_connection = null;  // closest puzzle if there is collision was detected
 
     // lists used to track all possible neighbours and all connected puzzles respectivly
-    private List<ConnectionPoint> neighbours_data;
+    [SerializeField] private List<ConnectionPoint> neighbours_data;
     private List<GameObject> connections;
-
     
     
+    private PuzzleDataTracker dataTracker;
+    //private SpriteRenderer Thickness_ref;
 
     private void Awake()
     {
@@ -38,6 +39,9 @@ public class PuzzlePiece : MonoBehaviour
         neighbours_data = new List<ConnectionPoint>();
         SR_ref = gameObject.GetComponent<SpriteRenderer>();
         connections = new List<GameObject>() { gameObject };
+        dataTracker = GameObject.FindGameObjectsWithTag("GameManager")[0].GetComponent<PuzzleDataTracker>();
+        //Thickness_ref = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        
     }
 
     //setters
@@ -73,48 +77,90 @@ public class PuzzlePiece : MonoBehaviour
     
     public ref List<GameObject> GetConnections() => ref connections; 
    
+    public void MoveToTop() 
+    {
+        foreach(var obj in connections) 
+        {
+            obj.transform.position = new Vector3(obj.transform.position.x, obj.transform.position.y, -1);
+        }
+    }
+
+    public void MoveToBottom()
+    {
+        foreach (var obj in connections)
+        {
+            obj.transform.position = new Vector3(obj.transform.position.x, obj.transform.position.y, 1);
+        }
+    }
 
     // currently only adding fading on mouse enter of collider
     private void OnMouseEnter()
     {
+        //if (dataTracker.IsInteractionDisabled())
+        //    return;
+
         if (!MC_ref.Is_holding())
         {
             // add sound effects
 
-
+            //print("entered" + (SR_ref.color.a == 1));
             // fading on hover
-            SR_ref.color -= hover_light;           
+            if (1 - SR_ref.color.a < hover_light.a)
+            {
+                SR_ref.color -= hover_light;
+                //Thickness_ref.color -= hover_light;
+            }
+
         }
     }
 
     // currently only remove fading on mouse exit of collider
     private void OnMouseExit()
     {
+        //if (dataTracker.IsInteractionDisabled())
+        //    return; 
+
+
         if (!MC_ref.Is_holding())
         {
             // fading on hover
-            SR_ref.color += hover_light;
+            if (SR_ref.color.a < 1) 
+            { 
+                SR_ref.color += hover_light;
+                //Thickness_ref.color += hover_light;
+            }
+
         }
     }
 
     // taking puzzle as holded to check it for connections
     private void OnMouseDown()
     {
+        if (dataTracker.IsInteractionDisabled())
+            return;
+
         MC_ref.SetHoldedPuzzle(this);
-
-        // move to the top <realization> ------------------------------------------------------------- (3)
-
         offset = Camera.main.ScreenToWorldPoint(Input.mousePosition) - gameObject.transform.position;
-        
-        
-        collision.enabled = false;
+
+
+        ChangeCollisionState(false);
+        foreach (var t in connections)
+        {
+            t.GetComponent<PuzzlePiece>().ChangeCollisionState(false);
+        }
+
         Is_loocking_for_neighbours = true;
     }
 
     //connect magneted puzzle to <connections> or if not magneted remove puzzle from holded
     private void OnMouseUp()
-    {   
-        collision.enabled = true;
+    {
+        ChangeCollisionState(true);
+        foreach(var t in connections) 
+        {
+            t.GetComponent<PuzzlePiece>().ChangeCollisionState(true);
+        }
+
         SR_ref.color += hover_light;
         Is_loocking_for_neighbours = false;
 
@@ -128,8 +174,16 @@ public class PuzzlePiece : MonoBehaviour
         MC_ref.UnsetHoldedPuzzle();
     }
 
+    public void ChangeCollisionState(bool state) 
+    {
+        collision.enabled = state;
+    }
+
+
     private void OnMouseDrag()
     {
+        if (dataTracker.IsInteractionDisabled())
+            return;
         // getting position of mouse and change of the moved object
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3 change = (Vector2)mousePos - (Vector2)gameObject.transform.position - offset;
@@ -182,7 +236,7 @@ public class PuzzlePiece : MonoBehaviour
  
     private void ConnectPuzzle(PuzzlePiece p1) 
     {
-        print("connecting puzzles " + this.GetIndex() + " and " + p1.GetIndex());
+        //print("connecting puzzles " + this.GetIndex() + " and " + p1.GetIndex());
 
         //adding holded tiles to connections
         foreach (var obj in connections)
@@ -211,6 +265,8 @@ public class PuzzlePiece : MonoBehaviour
         {   
             obj.GetComponent<PuzzlePiece>().SetNeighboursDataByRef(ref p1.GetNeighboursData());
         }
+
+        dataTracker.SetMaxComb(connections.Count);
     }
 
 
@@ -241,7 +297,11 @@ public class PuzzlePiece : MonoBehaviour
         {
             CheckCollisionWithNeighbours();
         }
-
+        //if (dataTracker.IsInteractionDisabled() && SR_ref.color.a < 1) 
+        //{
+        //    SR_ref.color += hover_light;
+        //}
+                
     }
 
 

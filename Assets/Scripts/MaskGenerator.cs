@@ -357,7 +357,7 @@ public class MaskGenerator : MonoBehaviour
     {
         Vector2 st = center + new Vector2(radius * Mathf.Cos(0), radius * Mathf.Sin(0));
 
-        for (float r = radius; r > 0; r -= 2)
+        for (float r = radius; r >= 0; r -= 1.5f)
         {
             for (float t = Mathf.PI / 3; t < 2 * Mathf.PI; t += Mathf.PI / 3)
             {
@@ -414,7 +414,7 @@ public class MaskGenerator : MonoBehaviour
         numberofp.x =  (c.width - radius / 2) / (3f * radius) ;
         float shift = (c.width - radius / 2 - (numberofp.x % 1 >= 0.5 ? (int)numberofp.x + 0.5f : (int)numberofp.x) * radius * 3f)/2;
         
-        for (float i = -side_x / 2; i <= c.height - side_x / 2; i += side_x)
+        for (float i = - side_x / 2; i <= c.height + side_x / 2; i += side_x)
         {
             for (float j = shift - radius * 3; j <= c.width; j += radius * 3)
             {
@@ -426,7 +426,7 @@ public class MaskGenerator : MonoBehaviour
                 {
                     DrawHex(c, new Vector2(j + radius, i), radius, Color.black, true);
                 }
-                if (j >= shift && i >= side_x / 2 && i < c.height - side_x && j < c.width - radius * 3)
+                if (j >= shift - 1 && i >= side_x / 2 && i <= c.height - side_x && j <= c.width - radius * 3 + 1)
                 {
                     DrawHex(c, new Vector2(j + 5 * radius / 2, i + side_x / 2), radius, Color.black);
                 }

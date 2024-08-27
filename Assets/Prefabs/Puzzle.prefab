@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4652521682276383523}
   - component: {fileID: 1260286432464296634}
   - component: {fileID: 4875491399671775165}
-  - component: {fileID: 6555215074617268657}
+  - component: {fileID: 1736261403925021394}
   m_Layer: 7
   m_Name: Puzzle
   m_TagString: Puzzle
@@ -54,7 +54,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 6fa5ece264ac7864f96f28f7d5c63747, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -99,15 +99,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   index: 26
-  center: {x: 5.3100004, y: -2.205}
-  offset: {x: 0, y: 0}
-  collision: {fileID: 0}
-  closest_connection:
-    puzzle_index: 0
-    collider_ref: {fileID: 0}
-  connections: []
---- !u!60 &6555215074617268657
-PolygonCollider2D:
+  neighbours_data: []
+--- !u!61 &1736261403925021394
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -141,13 +135,13 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.36, y: 1.59}
-    newSize: {x: 1.86, y: 1.78}
-    adaptiveTilingThreshold: 0.5
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Points:
-    m_Paths: []
-  m_UseDelaunayMesh: 0
+  serializedVersion: 2
+  m_Size: {x: 0.0001, y: 0.0001}
+  m_EdgeRadius: 0
