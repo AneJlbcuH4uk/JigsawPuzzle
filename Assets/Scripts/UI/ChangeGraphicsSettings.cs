@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using TMPro;
 using Unity.VisualScripting;
@@ -8,11 +10,13 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class ChangeSettings : MonoBehaviour
+public class ChangeGraphicsSettings : MonoBehaviour
 {
     [SerializeField] private TMP_Dropdown fullscreenmode_drop;
     [SerializeField] private TMP_Dropdown aspectratio_drop;
     [SerializeField] private TMP_Dropdown screenresolution_drop;
+
+    [SerializeField] private SettingsInit config;
 
     private static List<FullScreenMode> mode = new List<FullScreenMode>()
     {
@@ -75,11 +79,15 @@ public class ChangeSettings : MonoBehaviour
 
     private static List<List<Vector2Int>> ratio_to_res = new List<List<Vector2Int>>();
 
-    private static List<float> t = new List<float>() { 4 / 3, 3 / 2, 16 / 10, 16 / 9, 21 / 9, -1 };
+    private static List<float> t = new List<float>() { 4f / 3f, 3f / 2f, 16f / 10f, 16f / 9f, 21f / 9f, -1f };
 
-    private Vector2Int set_to_resol = Vector2Int.zero;
+    private GraphicSettings GraphicSettings;
+
+    //private Vector2Int set_to_resol = Vector2Int.zero;
     private string set_to_ratio = "";
-    private FullScreenMode set_to_mode = FullScreenMode.ExclusiveFullScreen;
+    //private FullScreenMode set_to_mode = FullScreenMode.ExclusiveFullScreen;
+
+    public string path_to_settings;
 
     private void Start()
     {
@@ -90,41 +98,43 @@ public class ChangeSettings : MonoBehaviour
         ratio_to_res.Add(List_of_res_21_9);
         ratio_to_res.Add(List_of_res_others);
 
-        set_to_resol = new Vector2Int(Screen.width, Screen.height);
+        GraphicSettings = config.GetGraphicsSettings();
 
-        print(set_to_resol + " " + (float)set_to_resol.x / (float)set_to_resol.y);
-        print(Mathf.Clamp((int)Screen.fullScreenMode - 1, 0, 2));
-        print(Screen.fullScreenMode);
+        fullscreenmode_drop.value = GraphicSettings.FullscreenMode;
 
-        fullscreenmode_drop.value = Mathf.Clamp((int)Screen.fullScreenMode - 1,0,2);
+        int index = t.FindIndex(a => isEqual(a, (float)GraphicSettings.ScreenResolutionWidth / (float)GraphicSettings.ScreenResolutionHeight));
+        if(index == -1)
+            index = 5;
 
-        //int index = t.FindIndex(a => a == (float)set_to_resol.x / (float)set_to_resol.y);
-        //aspectratio_drop.value = index;
+        Vector2Int cur_res = new Vector2Int(GraphicSettings.ScreenResolutionWidth, GraphicSettings.ScreenResolutionHeight);
+        int res_ind = ratio_to_res[index].FindIndex(a => a == cur_res);
+        if (res_ind == -1)
+            res_ind = 0;
 
-        
-        //print(ratio_to_res[aspectratio_drop.value].FindIndex(a => Vector2.Distance(a, set_to_resol) < 0.01f));
-
-        ChangeResolutionDroptable(0);
-
-        //screenresolution_drop.value = ratio_to_res[aspectratio_drop.value].FindIndex(a => a == set_to_resol);
-
-        
+        aspectratio_drop.value = index;
+        ChangeResolutionDroptable(index, res_ind);     
     }
 
-    private void LoadSettingsFromfile() 
+    bool isEqual(float a, float b)
     {
-
-
-
+        float eps = 0.01f;
+        if (Mathf.Abs(a - b) <= eps)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 
     public void OnWindowModeChanged() 
     {
-        //
-        set_to_mode = mode[fullscreenmode_drop.value];
+        GraphicSettings.FullscreenMode = Mathf.Clamp((int)mode[fullscreenmode_drop.value] - 1,0,2);
+        //set_to_mode = mode[fullscreenmode_drop.value];
         fullscreenmode_drop.Hide();
-        print(set_to_mode);
+        //print(set_to_mode);
     }
 
     public void OnAspectRatioChange() 
@@ -134,12 +144,12 @@ public class ChangeSettings : MonoBehaviour
         print(aspectratio_drop.captionText.text);
     }
 
-    private void ChangeResolutionDroptable(int index) 
+    private void ChangeResolutionDroptable(int index, int res_ind = 0) 
     {
         screenresolution_drop.Hide();
         screenresolution_drop.ClearOptions();
 
-        List<string> options = new List<string>();//{ " --- ---" };
+        List<string> options = new List<string>();//{ "--- ---" };
 
         foreach (Vector2Int obj in ratio_to_res[index]) 
         {
@@ -148,31 +158,42 @@ public class ChangeSettings : MonoBehaviour
         screenresolution_drop.AddOptions(options);
 
         set_to_ratio = aspectratio_drop.captionText.text;
-        screenresolution_drop.value = 0;
-        set_to_resol = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value];
-        print(set_to_resol);
+        screenresolution_drop.value = res_ind;
+
+        GraphicSettings.ScreenResolutionWidth = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value].x;
+        GraphicSettings.ScreenResolutionHeight = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value].y;
+
+        //set_to_resol = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value];
+        //print(set_to_resol);
     }
 
     public void OnResolutionChange() 
     {
         if (screenresolution_drop.value >= 0) {
             Vector2Int res = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value];
-            set_to_resol = res;
+            GraphicSettings.ScreenResolutionWidth = res.x;
+            GraphicSettings.ScreenResolutionHeight = res.y;
             //Screen.SetResolution(res.x, res.y, fullscreenmode_drop.value != 2);
         }    
     }
 
     public void OnButtonSave() 
     {
-        if(set_to_mode != Screen.fullScreenMode) 
+        if(GraphicSettings.FullscreenMode != (int)Screen.fullScreenMode) 
         {
-            Screen.fullScreenMode = set_to_mode;
+            Screen.fullScreenMode = (FullScreenMode)Mathf.Clamp(GraphicSettings.FullscreenMode == 0 ? GraphicSettings.FullscreenMode : GraphicSettings.FullscreenMode + 1,0,3);
         }
         
-        if(set_to_resol != new Vector2Int(Screen.width, Screen.height) && set_to_resol != Vector2Int.zero)
+        if(GraphicSettings.ScreenResolutionWidth != Screen.width
+            && GraphicSettings.ScreenResolutionHeight != Screen.height
+            && GraphicSettings.ScreenResolutionWidth != 0 
+            && GraphicSettings.ScreenResolutionHeight != 0)
         {
-            Screen.SetResolution(set_to_resol.x, set_to_resol.y, mode[fullscreenmode_drop.value]);
+            Screen.SetResolution(GraphicSettings.ScreenResolutionWidth, GraphicSettings.ScreenResolutionHeight, mode[fullscreenmode_drop.value]);
         }
+
+        config.SaveSettings(GraphicSettings, Settings.Graphics);
+
     }
 
 }

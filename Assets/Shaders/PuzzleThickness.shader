@@ -60,6 +60,7 @@ Shader "Unlit/PuzzleThickness"
 
                 fixed4 col1 = tex2D(_MainTex, i.uv);
                 float4 col2 = tex2D(_MainTex, i.uv + float2(0 ,_MoveAmount)); 
+
                 //col2.xyz = 0;
                 col2.xyz = float3(0.03,0.03,0.03);
 

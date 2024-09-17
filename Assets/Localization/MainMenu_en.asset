@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: MainMenu_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: c37a12deeb74c574e80211e42124d635, type: 2}
+  m_Metadata:
+    m_Items:
+    - rid: 314913540942331944
+  m_TableData:
+  - m_Id: 13382025216
+    m_Localized: Mask Type
+    m_Metadata:
+      m_Items:
+      - rid: 314913540942331944
+  - m_Id: 156051275776
+    m_Localized: Puzzle Quantity
+    m_Metadata:
+      m_Items:
+      - rid: 314913540942331944
+  - m_Id: 2279497367552
+    m_Localized: Full Screen Mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2451954565120
+    m_Localized: Screen Ratio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2494841323520
+    m_Localized: Screen Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3519950192640
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 719734347759616
+    m_Localized: Change Langage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2469749487403008
+    m_Localized: Show System Clock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2470893349601280
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2470919614332928
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2471265065598976
+    m_Localized: Are you sure you want to leave?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543534269890560
+    m_Localized: Master Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543599336128512
+    m_Localized: Music Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543640960401408
+    m_Localized: Effects Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543755171299328
+    m_Localized: Mute Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543777464025088
+    m_Localized: Mute on Minimize
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 314913540942331944
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 13382025216
+        - id: 156051275776
