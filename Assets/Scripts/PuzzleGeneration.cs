@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
 enum Side: int
@@ -9,8 +10,6 @@ enum Side: int
     Left = -1,
     Right = 1
 }
-
-
 
 
 public class PuzzleGeneration : MonoBehaviour
@@ -24,6 +23,10 @@ public class PuzzleGeneration : MonoBehaviour
     [SerializeField] private int number_of_puzzles_in_height;
     [SerializeField] private MaskType mask_type;
     [SerializeField] private GameObject puzzle_holder;
+    [SerializeField] private Color outline_color = Color.white;
+    [SerializeField] private int outline_width = 4;
+
+    private PuzzleLoadingData pld;
 
     private Vector2 image_offset = new Vector2 (6,3);
     private Texture2D mask;
@@ -38,27 +41,62 @@ public class PuzzleGeneration : MonoBehaviour
     InGameUi inGameUi;
 
     private bool is_loading = true;
+    private bool loading_from_save_file = false;
+
+    public void SetPLD(PuzzleLoadingData set) 
+    {
+        pld = set;
+    }
+    public PuzzleLoadingData GetPLD() 
+    {
+        return pld;
+    }
+
+    
+
     public bool Is_Loading() 
     {
         return is_loading;
     }
 
     private float startloadtime;
+    private List<Vector3> pp = new List<Vector3>();
+    public List<Vector3> GetPuzzlePositions() 
+    {
+        pp.Clear();
+        foreach (var ob in puzzles) 
+        {
+            pp.Add(ob.transform.position);
+        }
+        return pp;
+    }
+
 
     private IEnumerator Start()
     {
+        pld = GameObject.FindGameObjectWithTag("LoadingData").GetComponent<PuzzleLoadingData>();
+
         startloadtime = Time.realtimeSinceStartup;
         load_state = 0.1f;
         inGameUi = gameObject.GetComponent<InGameUi>();
-
         data_tracker = gameObject.GetComponent<PuzzleDataTracker>();
 
-        if (PuzzleLoadingData.data_was_set)
+        if (pld.data_was_set)
         {
-            PuzzleLoadingData.SetData(out image, out mask_type, out number_of_puzzles_in_height, out offset);
+            pld.GetSetData(out image, out mask_type, out number_of_puzzles_in_height, out offset);
+            loading_from_save_file = pld.loading_from_file;
         }
 
-        int segment_number = 1;
+        if (loading_from_save_file) 
+        {
+            UnityEngine.Random.InitState(pld.GetSeed());  
+        }
+        else 
+        {
+            int seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+            pld.SetSeed(seed);
+            UnityEngine.Random.InitState(seed);
+        }
 
         var mg = new MaskGenerator(new Vector2Int(image.width, image.height), number_of_puzzles_in_height, mask_type);
 
@@ -79,7 +117,8 @@ public class PuzzleGeneration : MonoBehaviour
 
         segments_marking = new int[mask.width, mask.height];
         puzzle_shapes = new List<RectInt>();
-
+  
+        int segment_number = 1;
         int totalSteps = 2;
         float stepIncrement = 0.85f / totalSteps;
 
@@ -91,10 +130,22 @@ public class PuzzleGeneration : MonoBehaviour
 
         data_tracker.SetNumberOfPuzzles(puzzle_shapes.Count);
 
-        ShufflePuzzles();
+        if (loading_from_save_file)
+        {
+            List<Vector3> pp = pld.GetTransforms();
+            for(int i = 0; i < puzzles.Count; i++) 
+            {
+                puzzles[i].GetComponent<PuzzlePiece>().ConnectOnLoad(pp[i]);
+            }
+        }
+        else
+        {
+            ShufflePuzzles();  
+        }
 
         load_state = 1f;
         inGameUi.UpdateLoadState(load_state);
+        MouseControl.GetInstance().SetPuzzles(puzzles);
         StartCoroutine(inGameUi.FinishLoad());
         
         yield return null;
@@ -103,64 +154,29 @@ public class PuzzleGeneration : MonoBehaviour
     }
 
     private IEnumerator GenerateSegments(int segment_number, float stepIncrement)
-    {    
+    {
+        
         yield return StartCoroutine(FloodFillWhiteAreas(mask, stepIncrement));
-
 
         foreach (var ob in puzzle_shapes)
         {
             CreatePuzzle(ob, segment_number);
-
-            //load_state = Mathf.Min(0.1f + stepIncrement * segment_number, 1f);
             segment_number += 1;
-            
-            //inGameUi.UpdateLoadState(load_state);
             yield return null;
         }
 
         yield return null;
-
-        //for (int i = 0; i < mask.width; i++)
-        //{
-        //    for (int j = 0; j < mask.height; j++)
-        //    {
-        //        if (CloseToWhite(mask.GetPixel(i, j)))
-        //        {
-        //            var temp = SelectSegment(mask, i, j, Color.black, segment_number);
-        //            puzzle_shapes.Add(temp);
-        //            CreatePuzzle(puzzle_shapes[segment_number - 1], segment_number);
-        //            segment_number += 1;
-        //        }
-
-        //        processedPixels++;
-
-        //        // Update load_state after processing a block of pixels
-        //        if (processedPixels % blockSize == 0)
-        //        {
-        //            load_state = Mathf.Min(0.1f + stepIncrement * ((float)processedPixels / totalPixels), 1f);
-        //            inGameUi.UpdateLoadState(load_state);
-
-        //            yield return null;
-        //        }
-        //    }
-        //}
-
-        //foreach( var o in puzzle_shapes) 
-        //{
-        //    print(o);
-        //}
-
     }
 
     private IEnumerator CheckLines(float stepIncrement)
     {
-        int totalLines = (mask.height / offset) + (mask.width / offset);
+        int totalLines = (image.height / offset) + (image.width / offset);
         int blockSize = totalLines / 10;  // Adjust this value to control how frequently load_state is updated
         int processedLines = 0;
 
-        for (int j = 1; j < mask.height; j += offset)
+        for (int j = 1; j < image.height; j += offset)
         {
-            StartCoroutine(CheckLine(j, mask.width, true));
+            StartCoroutine(CheckLine(j, image.width, true));
             processedLines++;
 
             // Update load_state after processing a block of lines
@@ -173,9 +189,9 @@ public class PuzzleGeneration : MonoBehaviour
             }
         }
 
-        for (int j = 1; j < mask.width; j += offset)
+        for (int j = 1; j < image.width; j += offset)
         {
-            StartCoroutine(CheckLine(j, mask.height, false));
+            StartCoroutine(CheckLine(j, image.height, false));
             processedLines++;
 
             if (processedLines % blockSize == 0)
@@ -193,7 +209,6 @@ public class PuzzleGeneration : MonoBehaviour
 
     public Vector3 GetCenter() 
     {
-        print(puzzles[0].transform.position + " " + puzzle_shapes[0]);
         Vector3 center = Vector3.zero;
 
         if (mask_type == MaskType.Hex)
@@ -204,12 +219,13 @@ public class PuzzleGeneration : MonoBehaviour
             }
             center /= puzzles.Count;
         }
-        if (mask_type == MaskType.Classic) 
+        if (mask_type == MaskType.Classic || mask_type == MaskType.Tshape || mask_type == MaskType.Sshape || mask_type == MaskType.SnowFlake || mask_type == MaskType.Scale) 
         {
             center = puzzles[0].transform.position - new Vector3((float)(puzzle_shapes[0].width - 1) / 200, (float)(puzzle_shapes[0].height - 1 - offset_for_thickness) / 200, 0);
             center += new Vector3((float)(image.width - 2) / 200, (float)(image.height - 2) / 200);
-        }
-        return center;
+        }   
+
+         return center;
     }
     
     public void DisablePuzzles() 
@@ -220,47 +236,55 @@ public class PuzzleGeneration : MonoBehaviour
         }
     }
 
-    public static Texture2D ChangeFormat(Texture2D oldTexture, TextureFormat newFormat)
-    {
-        //Create new empty Texture
-        Texture2D newTex = new Texture2D(oldTexture.width, oldTexture.height, newFormat, false);
-        //Copy old texture pixels into new one
-        newTex.SetPixels(oldTexture.GetPixels());
-        //Apply
-        newTex.Apply();
-
-        return newTex;
-    }
+    private List<int[]> possible_pairs = new List<int[]>();
 
     private void AddPair(int puzzle_index_1, int puzzle_index_2)
     {
-        var data_1 = puzzles[puzzle_index_1 - 1].GetComponent<PuzzlePiece>();
-        var data_2 = puzzles[puzzle_index_2 - 1].GetComponent<PuzzlePiece>();
+        if(possible_pairs.Any(elem => (elem[0] == puzzle_index_1 && elem[1] == puzzle_index_2) 
+                                    ||(elem[0] == puzzle_index_2 && elem[1] == puzzle_index_1)))
+        {
+            var data_1 = puzzles[puzzle_index_1 - 1].GetComponent<PuzzlePiece>();
+            var data_2 = puzzles[puzzle_index_2 - 1].GetComponent<PuzzlePiece>();
 
-        data_1.Add_neighbour(puzzle_index_2, data_2.GetCenter(), data_2.GetCollider());
-        data_2.Add_neighbour(puzzle_index_1, data_1.GetCenter(), data_1.GetCollider());
+            data_1.Add_neighbour(puzzle_index_2, data_2.GetCenter(), data_2.GetCollider());
+            data_2.Add_neighbour(puzzle_index_1, data_1.GetCenter(), data_1.GetCollider());
+
+            possible_pairs.RemoveAll(elem => (elem[0] == puzzle_index_1 && elem[1] == puzzle_index_2)
+                                          || (elem[0] == puzzle_index_2 && elem[1] == puzzle_index_1));
+        }
+        else 
+        {
+            possible_pairs.Add(new int[] { puzzle_index_1, puzzle_index_2 });          
+        }
+
+        
     }
 
-    private void ShufflePuzzles() 
+    private void ShufflePuzzles()
     {
         float loading_change = 0.1f / puzzles.Count;
 
+        float w = image.width / 140;
+        float h = image.height / 140;
+
         foreach (var t in puzzles)
         {
-            Vector2 random_pos = new Vector2(UnityEngine.Random.Range(0.0f, 6.0f), UnityEngine.Random.Range(-2.0f, 2.0f));
-            t.GetComponent<PuzzlePiece>().MovePuzzle(random_pos);
+            Vector2 random_pos = new Vector2(UnityEngine.Random.Range(-w, w), UnityEngine.Random.Range(-h, h));
+            var pp = t.GetComponent<PuzzlePiece>();
+
+            MouseControl.GetInstance().SetHoldedPuzzle(pp);
+            pp.MovePuzzle(random_pos - pp.GetCenter());
+            MouseControl.GetInstance().UnsetHoldedPuzzle();
         }
     }
 
+    
 
     IEnumerator CheckLine(int index, int length, bool isRow)
     {
-        //yield return new WaitForSeconds(1);
         int last_index = 0;
         bool was_zero = false;
         int last_zero = 0;
-
-        //int x = index;
 
         for (int i = 0; i < length; i++)
         {
@@ -280,9 +304,6 @@ public class PuzzleGeneration : MonoBehaviour
             }
             else
             {
-                //mask_copy.SetPixel(isRow ? i : index, isRow ? index : i, Color.red);
-
-
                 if (!was_zero)
                     last_zero = i;
                 was_zero = true;
@@ -292,8 +313,7 @@ public class PuzzleGeneration : MonoBehaviour
     }
 
     void CreatePuzzle(RectInt s, int segment_index)
-    {
-        
+    {   
         var temp = new Texture2D(s.xMax - s.xMin + 2, s.yMax - s.yMin + 2 + offset_for_thickness, TextureFormat.RGBA32, false);
         
         temp.wrapMode = TextureWrapMode.Clamp;
@@ -338,13 +358,84 @@ public class PuzzleGeneration : MonoBehaviour
         pp.SetIndex(segment_index);
         pp.SetCenter(place);
         sr.sprite = Sprite.Create(temp, new Rect(0, 0, temp.width, temp.height), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect);
+        GenerateOutline(obj, temp);
+
         //obj.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = sr.sprite;
 
         StartCoroutine(UpdateShapeToSprite(obj));
 
         //yield return null;
     }
+    private void GenerateOutline(GameObject puzzle, Texture2D img)
+    {
+        // Create the new texture
+        int tempWidth = img.width + outline_width * 2;
+        int tempHeight = img.height + outline_width * 2;
+        Texture2D temp = new Texture2D(tempWidth, tempHeight, TextureFormat.RGBA32, false);
 
+        // Initialize the clear background
+        Color[] clearColors = new Color[tempWidth * tempHeight];
+        for (int i = 0; i < clearColors.Length; i++)
+        {
+            clearColors[i] = Color.clear;
+        }
+
+        // Fill the brush with the outline color
+        Color[] brush = new Color[outline_width * outline_width * 4];
+        for (int i = 0; i < brush.Length; i++)
+        {
+            brush[i] = outline_color;
+        }
+
+        // Copy original image pixels into an array for faster access
+        Color[] imgPixels = img.GetPixels();
+        Color[] tempPixels = clearColors; // Start with a cleared array
+
+        // Check neighboring pixels and draw the outline
+        for (int y = 1; y < img.height - 1; y++)
+        {
+            for (int x = 1; x < img.width - 1; x++)
+            {
+                int imgIndex = y * img.width + x;
+                if (imgPixels[imgIndex] != Color.clear && IsEmptyNearby(imgPixels, x, y, img.width, img.height))
+                {
+                    DrawSquare(tempPixels, x + outline_width, y + outline_width, tempWidth, brush, outline_width);
+                }
+            }
+        }
+
+        // Apply the pixels to the new texture
+        temp.SetPixels(tempPixels);
+        temp.Apply();
+
+        // Set the texture as the sprite for the puzzle
+        puzzle.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite =
+            Sprite.Create(temp, new Rect(0, 0, temp.width, temp.height), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect);
+
+        bool IsEmptyNearby(Color[] pixels, int x, int y, int width, int height)
+        {
+            return pixels[(y - 1) * width + x] == Color.clear ||
+                   pixels[(y + 1) * width + x] == Color.clear ||
+                   pixels[y * width + (x - 1)] == Color.clear ||
+                   pixels[y * width + (x + 1)] == Color.clear;
+        }
+
+        void DrawSquare(Color[] pixels, int centerX, int centerY, int texWidth, Color[] brush, int brushSize)
+        {
+            int startX = centerX - outline_width;
+            int startY = centerY - outline_width;
+            int brushWidth = brushSize * 2;
+
+            for (int y = 0; y < brushWidth; y++)
+            {
+                for (int x = 0; x < brushWidth; x++)
+                {
+                    int pixelIndex = (startY + y) * texWidth + (startX + x);
+                    pixels[pixelIndex] = brush[y * brushWidth + x];
+                }
+            }
+        }
+    }
 
     private IEnumerator UpdateShapeToSprite(GameObject obj)
     {
@@ -352,6 +443,7 @@ public class PuzzleGeneration : MonoBehaviour
         var t = obj.AddComponent<PolygonCollider2D>();
         t.isTrigger = true;
         obj.GetComponent<PuzzlePiece>().Set_collider(t);
+   
         yield return null;
     }
 
@@ -359,90 +451,6 @@ public class PuzzleGeneration : MonoBehaviour
     {
         return c.b + c.g + c.r > 2.8;
     }
-
-
-    //private RectInt SelectSegment(Texture2D mask, int x, int y, Color c, int number)
-    //{
-    //    RectInt res = new RectInt();
-    //    res.xMin = x; res.xMax = x;
-    //    res.yMin = y; res.yMax = y;
-
-    //    var PixelQueue = new Queue<Tuple<int, int>>();
-    //    PixelQueue.Enqueue(Tuple.Create<int, int>(x, y));
-
-    //    //procedure which adds pixels at the top or the botom of <x,y> pixel (depends of <offset>) to the queue
-    //    //<was_white> flag is necessary to avoid adding extra pixels to the queue 
-    //    void AddPixelsToQueue(int x, int y, ref bool was_white, int offset)
-    //    {
-    //        if (CloseToWhite(mask.GetPixel(x, y + offset)))
-    //        {
-    //            if (!was_white)
-    //            {
-    //                var pixel = Tuple.Create<int, int>(x, y + offset);
-    //                PixelQueue.Enqueue(pixel);
-    //                RecalculateBordery(y + offset);
-    //                was_white = true;
-    //            }
-    //        }
-    //        else
-    //            was_white = false;
-    //    }
-    //    //procedure which moves to the left or right from <temp> pixel (depends of <offset>)
-    //    //and recolor CloseToWhite pixels into <c> Color. Additionaly marks recolored pixel in
-    //    //<segments_marking> array with <number> index
-    //    void CheckTopAndBottomPixels(Tuple<int, int> temp, ref bool was_white_top, ref bool was_white_bottom, int offset)
-    //    {
-    //        int shift = offset > 0 ? 1 : 0;
-    //        for (int i = temp.Item1 + shift; i < mask.width && i >= 0; i += offset)
-    //        {
-
-    //            if (CloseToWhite(mask.GetPixel(i, temp.Item2)))
-    //            {
-    //                mask.SetPixel(i, temp.Item2, c);
-    //                segments_marking[i, temp.Item2] = number;
-    //            }
-    //            else
-    //            {
-    //                RecalculateBorderx(i - offset);
-    //                break;
-    //            }
-    //            if (temp.Item2 != 0)
-    //                AddPixelsToQueue(i, temp.Item2, ref was_white_bottom, -1);
-    //            if (temp.Item2 != mask.height - 1)
-    //                AddPixelsToQueue(i, temp.Item2, ref was_white_top, 1);
-    //        }
-    //    }
-    //    void RecalculateBorderx(int x)
-    //    {
-    //        res.xMin = res.xMin > x ? x : res.xMin;
-    //        res.xMax = res.xMax < x ? x : res.xMax;
-    //    }
-
-    //    void RecalculateBordery(int y)
-    //    {
-    //        res.yMin = res.yMin > y ? y : res.yMin;
-    //        res.yMax = res.yMax < y ? y : res.yMax;
-    //    }
-
-
-    //    while (PixelQueue.Count != 0)
-    //    {
-    //        bool was_white_top = false;
-    //        bool was_white_bottom = false;
-    //        var temp = PixelQueue.Peek();
-
-    //        CheckTopAndBottomPixels(temp, ref was_white_top, ref was_white_bottom, (int)Side.Right);
-
-    //        was_white_top = false;
-    //        was_white_bottom = false;
-    //        CheckTopAndBottomPixels(temp, ref was_white_top, ref was_white_bottom, (int)Side.Left);
-
-    //        PixelQueue.Dequeue();
-    //    }
-    //    mask.Apply();
-    //    return res;
-    //}
-
 
     private IEnumerator FloodFillWhiteAreas(Texture2D texture,float stepIncrement)
     {
@@ -542,8 +550,6 @@ public class PuzzleGeneration : MonoBehaviour
         // Set the filled pixels back to the texture
         texture.SetPixels(pixels);
         texture.Apply();
-
-        //print(Mathf.Max(visited));
 
         yield return null;
     }

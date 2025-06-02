@@ -1,16 +1,10 @@
-using System;
-using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
-using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
-public enum MaskType { Classic, Hex }
-public class MaskGenerator : MonoBehaviour
+public enum MaskType { Classic, Hex, Tshape, Scale, Sshape, SnowFlake }
+public class MaskGenerator
 {
     
     private int side_number = 10;
@@ -94,27 +88,17 @@ public class MaskGenerator : MonoBehaviour
                 {
                     CalculateTangents(rand, sin, is_bottom, ref tan1, ref tan2, ref tan_sin, ref centers_for_tangents);
                 }
-
-
-                
+       
                 // drawing ellipses
                 for (float t = 0; t <= Mathf.PI * 2; t += Mathf.PI / 720)
                 {
-                    //SetPixelsInRange(Mathf.RoundToInt(i), Mathf.RoundToInt(j * side_y + con_shift), Color.black, vert);
                     float ang = ellipse_angle(a, b, t);
-                    //if (ang > -tan1 || ang < tan1 + Mathf.PI)
-                   
-
-                    //print(tan1 * Mathf.Rad2Deg + " | " + tan2 * Mathf.Rad2Deg);
-
                     if (is_bottom)  //if under the sin line
                     {
                         if (t < -Mathf.Atan(tan1) || t > Mathf.Atan(tan1) + Mathf.PI)
                         {
                             
-                            //print(t * Mathf.Rad2Deg); 
                             SetPixelsInRange(c, Mathf.RoundToInt(i + a * Mathf.Cos(ang)), Mathf.RoundToInt(j * side_y + con_shift + b * Mathf.Sin(ang)), Color.black, vert);
-                            //SetPixelsInRange(Mathf.RoundToInt(i + a * Mathf.Cos(t)), Mathf.RoundToInt(j * side_y + con_shift + a * Mathf.Sin(t)), Color.green, vert);
 
                         }
                     }
@@ -123,7 +107,6 @@ public class MaskGenerator : MonoBehaviour
                         if (t < Mathf.Atan(tan2) + Mathf.PI || t > 2 * Mathf.PI - Mathf.Atan(tan2))
                         {
                             SetPixelsInRange(c, Mathf.RoundToInt(i + a * Mathf.Cos(ang)), Mathf.RoundToInt(j * side_y + con_shift + b * Mathf.Sin(ang)), Color.black, vert);
-                            //SetPixelsInRange(Mathf.RoundToInt(i + a * Mathf.Cos(t)), Mathf.RoundToInt(j * side_y + con_shift + a * Mathf.Sin(t)), Color.green, vert);
                         }
                     }
                 }
@@ -172,8 +155,6 @@ public class MaskGenerator : MonoBehaviour
             }
         }
 
-        //SetPixelsInRange(Mathf.RoundToInt(centers_for_tangents[1].x), Mathf.RoundToInt(centers_for_tangents[1].y), Color.red, vert);
-
         void CalculateTangents(float rand, float sin, bool is_bottom, ref float tan1, ref float tan2, ref float tan_sin, ref Vector2[] centers_for_tangents) 
         {
             float i = side_x / 2;
@@ -199,20 +180,6 @@ public class MaskGenerator : MonoBehaviour
                 {
 
                     tan1 = Mathf.Tan(Mathf.Atan2((side_y + c_t1 - centers_for_tangents[2].y) , (i - centers_for_tangents[2].x)));
-
-                    //for (float m = 0; m < 75; m += 0.1f)
-                    //{
-                    //    SetPixelsInRange(Mathf.RoundToInt(centers_for_tangents[2].x + m), Mathf.RoundToInt(centers_for_tangents[2].y + m * tan1), Color.blue, vert);
-                    //    SetPixelsInRange(Mathf.RoundToInt(centers_for_tangents[2].x - m), Mathf.RoundToInt(centers_for_tangents[2].y - m * tan1), Color.blue, vert);
-                    //    SetPixelsInRange(Mathf.RoundToInt(side_x - centers_for_tangents[2].x + m), Mathf.RoundToInt(centers_for_tangents[2].y + m * -tan1), Color.blue, vert);
-                    //    SetPixelsInRange(Mathf.RoundToInt(side_x - centers_for_tangents[2].x - m), Mathf.RoundToInt(centers_for_tangents[2].y - m * -tan1), Color.blue, vert);
-
-                    //}
-
-                    //SetPixelsInRange(Mathf.RoundToInt(i), Mathf.RoundToInt(pixel_sides.y + c_t1), Color.red, vert);
-
-                    //tan1 = (centers_for_tangents[2].y - side_y - c_t1) / (centers_for_tangents[2].x - i);
-                    //print(tan1 + "|" + Mathf.Atan2((side_y + c_t1 - centers_for_tangents[2].y), (i - centers_for_tangents[2].x)));
                     break;
                 }
 
@@ -227,19 +194,7 @@ public class MaskGenerator : MonoBehaviour
                 }
                 if (tan2 == 0 && centers_for_tangents[0] != Vector2.zero)
                 {
-
                     tan2 = Mathf.Tan(Mathf.Atan2((side_y + c_t2 - centers_for_tangents[0].y) , (i - centers_for_tangents[0].x)));
-
-                    //for (float m = 0; m < 75; m += 0.1f)
-                    //{
-                    //    SetPixelsInRange(Mathf.RoundToInt(centers_for_tangents[0].x + m), Mathf.RoundToInt(centers_for_tangents[0].y + m * tan2), Color.red, vert);
-                    //    SetPixelsInRange(Mathf.RoundToInt(centers_for_tangents[0].x - m), Mathf.RoundToInt(centers_for_tangents[0].y - m * tan2), Color.red, vert);
-                    //    SetPixelsInRange(Mathf.RoundToInt(side_x - centers_for_tangents[0].x + m), Mathf.RoundToInt(centers_for_tangents[0].y + m * -tan2), Color.red, vert);
-                    //    SetPixelsInRange(Mathf.RoundToInt(side_x - centers_for_tangents[0].x - m), Mathf.RoundToInt(centers_for_tangents[0].y - m * -tan2), Color.red, vert);
-                    //}
-
-                    //tan2 = (centers_for_tangents[0].y - side_y - c_t2) / (centers_for_tangents[0].x - i);
-                    //print(tan2 + "|" + Mathf.Atan2((side_y + c_t2 - centers_for_tangents[0].y), (i - centers_for_tangents[0].x)));
                     break;
                 }
 
@@ -285,42 +240,18 @@ public class MaskGenerator : MonoBehaviour
             return new Vector2(temp_x, temp_y);
         }
 
-        //remake 
         void _sendRay(Vector2 center, float angle, bool is_bottom = true)
         {
             float distance_to_elipse = a * b / Mathf.Sqrt(a * a * Mathf.Sin(angle) * Mathf.Sin(angle) + b * b * Mathf.Cos(angle) * Mathf.Cos(angle));
             int index_n = is_bottom ? 0 : 2;
 
             Vector2 ip = GetIntersectionPoint(center, centers_for_tangents[1], Mathf.Tan(angle), Mathf.Tan(tan_sin));
-            //SetPixelsInRange(Mathf.RoundToInt(ip.x), Mathf.RoundToInt(ip.y), Color.magenta,vert);
 
             if (Mathf.Abs(Vector2.Distance(ip, centers_for_tangents[1]) -
                         (Vector2.Distance(ip, center) - distance_to_elipse)) < 0.5f) {
-                //print(Vector2.Distance(ip, centers_for_tangents[1]) + " | " + Vector2.Distance(ip, center) + " | " + ip + " | " + distance_to_elipse);
-                //print(ip);
-                //SetPixelsInRange(Mathf.RoundToInt(ip.x), Mathf.RoundToInt(ip.y), Color.red, vert);
                 centers_for_tangents[index_n] = ip;
             }
 
-            //for (float i = center.x - 1.5f * a; i < center.x + 1.5f * a; i += 0.005f)
-            //{
-            //    float sin_normal_y = (float)centers_for_tangents[1].y - ((i - (float)centers_for_tangents[1].x) * side_x) / (sin_coef * Mathf.PI * Mathf.Cos(v));
-            //    float elipse_normal_y = (i - center.x) * Mathf.Tan(angle) + center.y;
-
-            //    if (Mathf.Abs(sin_normal_y - elipse_normal_y) < 0.1f)
-            //    {
-            //        if (Mathf.Abs(Vector2.Distance(new Vector2(i, elipse_normal_y), centers_for_tangents[1]) -
-            //            (Vector2.Distance(new Vector2(i, elipse_normal_y), center) - distance_to_elipse)) < 0.5f)
-            //        {
-            //            centers_for_tangents[index_n] = new Vector2(i, elipse_normal_y);
-
-            //            print("a"+Vector2.Distance(ip, centers_for_tangents[1]) + " | " + (Vector2.Distance(ip, center) - distance_to_elipse) + " | " + ip + " | " );
-            //            print("b"+centers_for_tangents[index_n] + "   " + ip + " | "+ Vector2.Distance(new Vector2(i, elipse_normal_y), centers_for_tangents[1]) + " | " + (Vector2.Distance(new Vector2(i, elipse_normal_y), center) - distance_to_elipse));
-            //            break;
-            //        }
-
-            //    }
-            //}
 
         }
 
@@ -372,7 +303,7 @@ public class MaskGenerator : MonoBehaviour
         }
     }
 
-        private void DrawLine(Texture2D c, Vector2 start, Vector2 end, Color color)
+    private void DrawLine(Texture2D c, Vector2 start, Vector2 end, Color color)
     {
         int x0 = Mathf.RoundToInt(start.x);
         int y0 = Mathf.RoundToInt(start.y);
@@ -438,6 +369,480 @@ public class MaskGenerator : MonoBehaviour
         }
     }
 
+    private void DrawTshapeGrid(Texture2D c, Vector2 numberofp) 
+    {
+        numberofp.x = Mathf.Round(c.width / (c.height / numberofp.y));
+
+        for (int i = 1; i < numberofp.x; i++) 
+        {
+            Vector2 start = new Vector2(c.width / numberofp.x * i, 0) ;
+            Vector2 end = new Vector2( c.width / numberofp.x * i, c.height ) ;
+
+            DrawLine(c, start, end, Color.black);
+        }
+
+        for (int i = 1; i < numberofp.y; i++)
+        {
+            Vector2 start = new Vector2(0,c.height / numberofp.y * i) ;
+            Vector2 end = new Vector2(c.width, c.height / numberofp.y * i) ;
+
+            DrawLine(c, start, end, Color.black);
+        }
+
+        for (int i = 0; i < numberofp.y; i++)
+        {
+            
+            Vector2 offsety = new Vector2(0, c.height / numberofp.y) / 2;
+
+            for (int j = 0; j < numberofp.x; j++)
+            {
+                float puzzle_width = c.width / numberofp.x;
+                float offsetx = puzzle_width / 4;
+               
+                Vector2 start = new Vector2(puzzle_width * j + offsetx, c.height / numberofp.y * i) + offsety;
+                Vector2 end = new Vector2(puzzle_width * (j + 1) - offsetx, c.height / numberofp.y * i) + offsety;
+
+                DrawLine(c, start, end, Color.black);
+            }
+        }
+
+        for (int i = 0; i < numberofp.x; i++)
+        {
+
+            Vector2 offsetx =  new Vector2( c.width / numberofp.x, 0) / 2;
+
+            for (int j = 0; j < numberofp.y; j++)
+            {
+                float puzzle_height = c.height / numberofp.y;
+                float offsety = puzzle_height / 4;
+
+                Vector2 start = new Vector2( c.width / numberofp.x * i, puzzle_height * j + offsety) + offsetx;
+                Vector2 end = new Vector2( c.width / numberofp.x * i, puzzle_height * (j + 1) - offsety) + offsetx;
+
+                DrawLine(c, start, end, Color.black);
+            }
+        }
+
+
+        for (int i = 0; i < numberofp.y; i++)
+        {
+
+            Vector2 offsety = new Vector2(0, c.height / numberofp.y) / 4;
+
+            for (int j = 0; j < numberofp.x; j++)
+            {
+                float puzzle_width = c.width / numberofp.x;
+                float offsetx = puzzle_width / 4;
+
+                Vector2 start = new Vector2(puzzle_width * j + offsetx, c.height / numberofp.y * i) + offsety;
+                Vector2 end = new Vector2(puzzle_width * (j + 1) - offsetx * 2, c.height / numberofp.y * i) + offsety;
+
+                DrawLine(c, start, end, Color.black);
+
+                start = new Vector2(puzzle_width * j + offsetx * 3, c.height / numberofp.y * i) + offsety;
+                end = new Vector2(puzzle_width * (j + 1), c.height / numberofp.y * i) + offsety;
+
+                DrawLine(c, start, end, Color.black);
+
+                start = new Vector2(puzzle_width * j, c.height / numberofp.y * i) + offsety * 3;
+                end = new Vector2(puzzle_width * (j + 1) - offsetx * 3, c.height / numberofp.y * i) + offsety * 3;
+
+                DrawLine(c, start, end, Color.black);
+
+                start = new Vector2(puzzle_width * j + offsetx * 2, c.height / numberofp.y * i) + offsety * 3;
+                end = new Vector2(puzzle_width * (j + 1) - offsetx, c.height / numberofp.y * i) + offsety * 3;
+
+                DrawLine(c, start, end, Color.black);
+
+            }
+        }
+
+        for (int i = 0; i < numberofp.x; i++)
+        {
+
+            Vector2 offsetx = new Vector2(c.width / numberofp.x, 0) / 4;
+
+            for (int j = 0; j < numberofp.y; j++)
+            {
+                float puzzle_height = c.height / numberofp.y;
+                float offsety = puzzle_height / 4;
+
+                Vector2 start = new Vector2(c.width / numberofp.x * i, puzzle_height * j + offsety * 2) + offsetx;
+                Vector2 end = new Vector2(c.width / numberofp.x * i, puzzle_height * (j + 1) - offsety) + offsetx;
+
+                DrawLine(c, start, end, Color.black);
+
+                start = new Vector2(c.width / numberofp.x * i, puzzle_height * j) + offsetx;
+                end = new Vector2(c.width / numberofp.x * i, puzzle_height * (j + 1) - offsety * 3) + offsetx;
+
+                DrawLine(c, start, end, Color.black);
+
+
+
+                start = new Vector2(c.width / numberofp.x * i, puzzle_height * j + offsety * 3) + offsetx * 3;
+                end = new Vector2(c.width / numberofp.x * i, puzzle_height * (j + 1)) + offsetx * 3;
+
+                DrawLine(c, start, end, Color.black);
+
+                start = new Vector2(c.width / numberofp.x * i, puzzle_height * j + offsety) + offsetx * 3;
+                end = new Vector2(c.width / numberofp.x * i, puzzle_height * (j + 1) - offsety * 2) + offsetx * 3;
+
+                DrawLine(c, start, end, Color.black);
+            }
+        }
+    }
+
+
+    private void DrawCircle(Texture2D c, Vector2 center, float radius, Color color, Vector2 circle_limits) 
+    {
+        for(float angle = circle_limits.x; angle < circle_limits.y; angle += Mathf.PI / 720) 
+        {
+            int x = Mathf.RoundToInt(Mathf.Sin(angle) * radius + center.x);
+            int y = Mathf.RoundToInt(Mathf.Cos(angle) * radius + center.y);
+            SetPixelsInRange(c, x, y, color, false);
+        }
+    }
+
+
+    private void DrawScaleGrid(Texture2D c, Vector2 numberofp) 
+    {
+        float radius = c.height / numberofp.y / 2;
+        numberofp.x = Mathf.FloorToInt(c.width / radius / 2);
+        float offset = (c.width - numberofp.x * radius * 2) / 2;
+        //print(numberofp);
+        for (int i = 0; i < numberofp.y; i++) 
+        {
+            for (int j = 0; j < numberofp.x; j++)
+            {
+                Vector2 center = new Vector2(j * 2 * radius + radius + offset , i * 2 * radius + radius);
+                Vector2 lim = new Vector2(-Mathf.PI/2, Mathf.PI/2);
+                DrawCircle(c, center, radius, Color.black, lim);
+            }
+        }
+
+        for (int i = 0; i <= numberofp.x; i++) 
+        {
+            for (int j = 0; j < numberofp.y; j++)
+            {
+                Vector2 center = new Vector2(i * 2 * radius + offset, j * radius * 2);
+                Vector2 lim = new Vector2(-Mathf.PI / 2, Mathf.PI / 2);
+                DrawCircle(c, center, radius, Color.black, lim);
+            }
+        }
+
+        c.Apply();
+
+        for (int i = 0; i <= numberofp.x; i++) 
+        {
+            Vector2 center = new Vector2(i * 2 * radius + offset, c.height - 1);
+            //Vector2 lim = new Vector2(0, Mathf.PI * 2);
+            //DrawCircle(c, center, 20, Color.red, lim);
+            FillArea(c, (int)center.x, (int)center.y,Color.black);
+        }
+        
+
+    }
+
+
+    public static void FillArea(Texture2D image, int startX, int startY, Color fillcolor)
+    {
+        if (image == null) return;
+
+        // Get the image dimensions
+        int width = image.width;
+        int height = image.height;
+
+        // Get the starting pixel color
+        Color startColor = image.GetPixel(startX, startY);
+
+        // If the starting pixel is already black, return
+        if (startColor == Color.black) return;
+
+        if (startColor == Color.white && fillcolor == Color.white) return;
+
+        // Create a stack to manage the pixels to process
+        Stack<Vector2Int> pixels = new Stack<Vector2Int>();
+        pixels.Push(new Vector2Int(startX, startY));
+
+        while (pixels.Count > 0)
+        {
+            Vector2Int current = pixels.Pop();
+            int x = current.x;
+            int y = current.y;
+
+            // Skip if out of bounds or already black
+            if (x < 0 || x >= width || y < 0 || y >= height || image.GetPixel(x, y) == Color.black || image.GetPixel(x, y) == fillcolor)
+                continue;
+
+            // Set the current pixel to black
+            image.SetPixel(x, y, fillcolor);
+
+            // Add neighbors to the stack
+            pixels.Push(new Vector2Int(x + 1, y)); // Right
+            pixels.Push(new Vector2Int(x - 1, y)); // Left
+            pixels.Push(new Vector2Int(x, y + 1)); // Up
+            pixels.Push(new Vector2Int(x, y - 1)); // Down
+        }
+
+        // Apply the changes to the texture
+        image.Apply();
+    }
+
+    private void DrawSshapeGrid(Texture2D c, Vector2 numberofp, float line_spawn_probability) 
+    {
+        numberofp.x = Mathf.Round(c.width / (c.height / numberofp.y));
+        float line_len_y = (c.height / numberofp.y) * 2 / 6;
+        float line_len_x = (c.width / numberofp.x) * 2 / 6;
+
+        Vector2 start = new Vector2(0, line_len_y * 2);
+        Vector2 end;
+
+        List<Vector2> startpoints = new List<Vector2>();
+
+        for (int i = 3; start.y <= c.height + c.width; i--) 
+        {
+            end = new Vector2(line_len_x * i, 0) + start;
+            DrawLine(c, start, end, Color.black);
+            startpoints.Add(end);
+
+            start += new Vector2(0, line_len_y * 3);
+            if (i == 1) 
+            {
+                i = 5;
+                start -= new Vector2(0, line_len_y * 2);
+            }
+        }
+
+        foreach (var v in startpoints)
+        {
+            end = v;
+            float t;
+            while (end.y > 0 || end.x < c.width)
+            {
+                start = end;
+                end = start + new Vector2(0, -line_len_y * 2);
+                DrawLine(c, start, end, Color.black);
+
+                t = Random.Range(0f, 1f);
+                if (t < line_spawn_probability) DrawLine(c, start, start + new Vector2(0, line_len_y), Color.black);
+
+
+                start = end;
+                end = start + new Vector2(line_len_x * 4, 0);
+                DrawLine(c, start, end, Color.black);
+
+                t = Random.Range(0f, 1f);
+                if (t < line_spawn_probability) DrawLine(c, start, start - new Vector2( 0, line_len_y), Color.black);
+            }
+        }
+
+        startpoints.Clear();
+        start = new Vector2(line_len_x, 0);
+
+        for (int i = 4; start.x <= c.height + c.width; i++)
+        {
+            end = new Vector2(0,line_len_y * i) + start;
+            DrawLine(c, start, end, Color.black);
+            startpoints.Add(end);
+
+            start += new Vector2(line_len_x * 3, 0);
+            if (i == 4)
+            {
+                i = 0;
+                start -= new Vector2(line_len_x * 2, 0);
+            }
+        }
+
+        start = new Vector2(-2*line_len_x, 0);
+
+        for (int i = 3; start.x > -c.height; i--)
+        {
+            end = new Vector2(0, line_len_y * i) + start;
+            DrawLine(c, start, end, Color.black);
+            startpoints.Add(end);
+
+            start -= new Vector2(line_len_x * 3, 0);
+            if (i == 0)
+            {
+                i = 4;
+                start += new Vector2(line_len_x * 2, 0);
+            }
+        }
+        foreach (var v in startpoints)
+        {
+            end = v;
+            float t;
+            while (end.y < c.height || end.x < c.width)
+            {
+                start = end;
+                end = start + new Vector2(line_len_x * 2, 0);
+                DrawLine(c, start, end, Color.black);
+
+                t = Random.Range(0f, 1f);
+                if (t < line_spawn_probability) DrawLine(c, start, start - new Vector2(line_len_x , 0), Color.black);
+
+
+                start = end;
+                end = start + new Vector2(0,line_len_y * 4);
+                DrawLine(c, start, end, Color.black);
+
+                t = Random.Range(0f, 1f);
+                if (t < line_spawn_probability) DrawLine(c, start, start + new Vector2(line_len_x, 0), Color.black);
+
+            }
+        }
+    }
+
+
+
+    List<Vector2> snowflake = new List<Vector2>();
+    private void DrawSnowflake(Texture2D c, Vector2 center, float radius, float iter, Color color)
+    {
+        List<Vector2> snowflakepoints = new List<Vector2>();
+        snowflakepoints.Add(center + new Vector2(0, radius));
+        snowflakepoints.Add(center + new Vector2(radius * Mathf.Cos(-Mathf.PI / 6), radius * Mathf.Sin(-Mathf.PI / 6)));
+        snowflakepoints.Add(center + new Vector2(radius * Mathf.Cos(Mathf.PI * 7 / 6), radius * Mathf.Sin(Mathf.PI * 7 / 6)));
+
+        if (snowflake.Count == 0)
+        {
+            for (int o = 0; o < iter; o++)
+            {
+                if (Vector2.Distance(snowflakepoints[0], snowflakepoints[1]) < 10) break;
+
+                List<Vector2> temp = new List<Vector2>();
+                for (int i = 0; i < snowflakepoints.Count; i++)
+                {
+                    temp.Add(snowflakepoints[i]);
+                    if (i == snowflakepoints.Count - 1)
+                    {
+                        foreach (var v in AddTriangleonLine(snowflakepoints[snowflakepoints.Count - 1], snowflakepoints[0]))
+                            temp.Add(v);
+                    }
+                    else
+                    {
+                        foreach (var v in AddTriangleonLine(snowflakepoints[i], snowflakepoints[i + 1]))
+                            temp.Add(v);
+                    }
+                }
+                snowflakepoints = temp;
+            }
+
+            for (int i_vec = 0; i_vec < snowflake.Count; i_vec++)
+            {
+                snowflake.Add(snowflakepoints[i_vec] - center);
+            }
+        }
+        else
+        {
+
+            for (int i_vec = 0; i_vec < snowflakepoints.Count; i_vec++)
+            {
+                snowflakepoints.Add(snowflake[i_vec] + center);
+            }
+        }
+
+        for (int i = 0; i < snowflakepoints.Count; i++)
+        {
+            if (i == snowflakepoints.Count - 1)
+            {
+                DrawLine(c, snowflakepoints[snowflakepoints.Count - 1], snowflakepoints[0], color);
+            }
+            else
+            {
+                DrawLine(c, snowflakepoints[i], snowflakepoints[i + 1], color);
+            }
+        }
+
+    }
+
+    private List<Vector2> AddTriangleonLine(Vector2 start,Vector2 end) 
+    {
+
+        Vector2 point3 = (end - start) * 2 / 3 + start;
+        Vector2 point1 = (end - start) / 3 + start;
+
+        float t = Mathf.Atan2(point3.y - point1.y, point3.x - point1.x);
+
+        Vector2 point2 = (point3 - point1) / 2 + point1;
+
+        Vector2 temp = point3 - point2;
+
+        point2 = new Vector2(-temp.y, temp.x) * Mathf.Sqrt(3) + point2;
+        List<Vector2> newtriangle = new List<Vector2>() { point1, point2, point3 };
+
+        return newtriangle;
+    }
+
+
+    private void DrawSnowFlakeGrid(Texture2D c,Vector2 numberofp, float iter) 
+    {
+        float radius = c.height / numberofp.y / 2;
+
+        numberofp.x = Mathf.Floor((c.width - 2 * radius) / (radius * 2 * Mathf.Sqrt(3))) + 1;
+        float offset_x = ((c.width - radius * 2) - radius * 2 * Mathf.Sqrt(3) * (numberofp.x - 1)) / 2;
+
+        for (int j = -1; j < numberofp.x + 1; j++)
+        {
+            for (int i = 0; i < numberofp.y + 1; i++)
+            {
+                Vector2 center;
+                if (i < numberofp.y)
+                {
+                    center = new Vector2(radius * 2 * Mathf.Sqrt(3) * j + radius + offset_x, radius * 2 * i + radius);
+                    DrawSnowflake(c, center, radius, iter, Color.black);
+                }
+                if (j < numberofp.x)
+                {
+                    center = new Vector2((radius * 2 * Mathf.Sqrt(3) * j + radius) + Mathf.Sqrt(3) * radius + offset_x, radius * 2 * i);
+                    DrawSnowflake(c, center, radius, iter, Color.black);
+                }
+            }
+        }
+
+        void CheckLine(int line, Color fill) 
+        {
+            int number_of_white_pixels = 0;
+            for (int i = 0; i < c.height; i++)
+            {
+                if (c.GetPixel(line, i) != Color.black)
+                {
+                    number_of_white_pixels++;
+                }
+                else
+                {
+                    if (number_of_white_pixels < radius / 2)
+                    {
+                        FillArea(c, line, i - 1, fill);
+                    }
+                    number_of_white_pixels = 0;
+                }
+            }
+        }
+
+        CheckLine(1, Color.red);
+        CheckLine(c.width-2, Color.red);
+
+        CheckLine((int)(1 + offset_x), Color.white);
+        CheckLine((int)(c.width - offset_x - 2), Color.white);
+
+        SwapRedToBlack(c);
+
+        void SwapRedToBlack(Texture2D texture)
+        {
+            Color[] pixels = texture.GetPixels();
+
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                if (pixels[i] == Color.red) // Exact match with Color.red
+                {
+                    pixels[i] = Color.black;
+                }
+            }
+
+            texture.SetPixels(pixels);
+            texture.Apply();
+        }
+    }
 
     void DrawPuzzleMask(Texture2D c, MaskType t) 
     {
@@ -449,6 +854,22 @@ public class MaskGenerator : MonoBehaviour
         if(t == MaskType.Hex) 
         { 
             DrawHexGrid(c, pixel_sides.y, number_of_puzzles);
+        }
+        if (t == MaskType.Tshape)
+        {
+            DrawTshapeGrid(c, number_of_puzzles);
+        }
+        if (t == MaskType.Scale)
+        {
+            DrawScaleGrid(c, number_of_puzzles);
+        }
+        if (t == MaskType.Sshape)
+        {
+            DrawSshapeGrid(c, number_of_puzzles,0.1f);
+        }
+        if(t == MaskType.SnowFlake) 
+        {
+            DrawSnowFlakeGrid(c, number_of_puzzles,6); 
         }
 
         c.Apply();       

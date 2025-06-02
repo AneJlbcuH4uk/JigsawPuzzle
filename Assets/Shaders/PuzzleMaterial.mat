@@ -10,7 +10,7 @@ Material:
   m_Name: PuzzleMaterial
   m_Shader: {fileID: 4800000, guid: d0b7a213f3ea57e4398fc09be51a3b63, type: 3}
   m_Parent: {fileID: 2100000, guid: 3f637545cf61e434fa2bed9662f43f3c, type: 2}
-  m_ModifiedSerializedProperties: 0
+  m_ModifiedSerializedProperties: 8
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -27,6 +27,7 @@ Material:
     m_Floats:
     - _CurFillPercent: 0.94
     - _MoveAmount: 0.01
+    - _Scale: 1.01
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 0.6117647}
   m_BuildTextureStacks: []

@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: MainMenu_pl
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: pl
+  m_SharedData: {fileID: 11400000, guid: c37a12deeb74c574e80211e42124d635, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 2469749487403008
+    m_Localized: "Poka\u017C zegar systemowy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 719734347759616
+    m_Localized: "J\u0119zyk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56129925154963456
+    m_Localized: Automatyczne zapisywanie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56130212829691904
+    m_Localized: "Cz\u0119stotliwo\u015B\u0107 automatycznego zapisu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56130402827468800
+    m_Localized: "Maksymalna liczba automatycznych zapis\xF3w"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3519950192640
+    m_Localized: Zapisz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543534269890560
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107 g\u0142\xF3wna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543599336128512
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107 muzyki"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543640960401408
+    m_Localized: "G\u0142o\u015Bno\u015B\u0107 efekt\xF3w"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543755171299328
+    m_Localized: "Wycisz gr\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543777464025088
+    m_Localized: Wycisz przy minimalizacji
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2279497367552
+    m_Localized: "Tryb pe\u0142noekranowy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2451954565120
+    m_Localized: Proporcje ekranu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2494841323520
+    m_Localized: "Rozdzielczo\u015B\u0107 ekranu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2470893349601280
+    m_Localized: Tak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2470919614332928
+    m_Localized: Nie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5778938544619520
+    m_Localized: "Masz niezapisane zmiany. Czy chcesz je zachowa\u0107?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 156051275776
+    m_Localized: "Ilo\u015B\u0107 puzzli"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13382025216
+    m_Localized: Typ maski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56549541098389504
+    m_Localized: "Wyjd\u017A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56549687836114944
+    m_Localized: Ustawienia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56548092570337280
+    m_Localized: "Uko\u0144czone puzzle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56131872318652416
+    m_Localized: "Zmie\u0144 nazw\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56132029898653696
+    m_Localized: Anuluj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56131107646701568
+    m_Localized: Ostatnie zapisane
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2471265065598976
+    m_Localized: "Czy na pewno chcesz wyj\u015B\u0107?"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

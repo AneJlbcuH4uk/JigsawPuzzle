@@ -10,7 +10,7 @@ public class PuzzlePiece : MonoBehaviour
 {
     [SerializeField] private static float magnet_distance = 0.2f;           // distance of puzzle magnet
 
-    private static MouseControl MC_ref = MouseControl.GetInstance();        // reference to MouseControl sript instance
+    private static MouseControl MC_ref;        // reference to MouseControl sript instance
     private static Color hover_light = new Color(0.0f, 0.0f, 0.0f, 0.4f);   // fade collor
 
     [SerializeField] private int index;                 // index of puzzle used in puzzle comparisons
@@ -21,15 +21,22 @@ public class PuzzlePiece : MonoBehaviour
     private SpriteRenderer SR_ref;                      // sprite renderer of puzzle keeps cropped image in form of puzzle
 
     //variables used in detection of neighbours 
-    private bool Is_loocking_for_neighbours = false;    // if holding puzzle with neighbours in list
+    private bool Is_looking_for_neighbours = false;    // if holding puzzle with neighbours in list
     private bool Is_magneting = false;                  // if current holded puzzle is magneted
     private ConnectionPoint closest_connection = null;  // closest puzzle if there is collision was detected
 
     // lists used to track all possible neighbours and all connected puzzles respectivly
     [SerializeField] private List<ConnectionPoint> neighbours_data;
     private List<GameObject> connections;
-    
-    
+
+
+    [SerializeField] private AudioClip ConnectionSound;
+    [SerializeField] private AudioClip HoverOverSound;
+    [SerializeField] private AudioClip PickPuzzleSound;
+
+
+
+
     private PuzzleDataTracker dataTracker;
     //private SpriteRenderer Thickness_ref;
 
@@ -40,9 +47,14 @@ public class PuzzlePiece : MonoBehaviour
         SR_ref = gameObject.GetComponent<SpriteRenderer>();
         connections = new List<GameObject>() { gameObject };
         dataTracker = GameObject.FindGameObjectsWithTag("GameManager")[0].GetComponent<PuzzleDataTracker>();
-        //Thickness_ref = transform.GetChild(0).GetComponent<SpriteRenderer>();
-        
+        //Thickness_ref = transform.GetChild(0).GetComponent<SpriteRenderer>();       
     }
+
+    private void Start()
+    {
+        MC_ref = MouseControl.GetInstance();
+    }
+
 
     //setters
     public void SetIndex(int index)
@@ -56,6 +68,7 @@ public class PuzzlePiece : MonoBehaviour
     public void Set_collider(Collider2D col)
     {
         collision = col;
+        //MC_ref.AddCollider(col);
     }
     public void SetNeighboursDataByRef(ref List<ConnectionPoint> r)
     {
@@ -67,7 +80,7 @@ public class PuzzlePiece : MonoBehaviour
     }
 
     // getters
-    private int GetIndex() => index;
+    public int GetIndex() => index;
 
     public Vector2 GetCenter() => center;
 
@@ -75,8 +88,15 @@ public class PuzzlePiece : MonoBehaviour
 
     public ref List<ConnectionPoint> GetNeighboursData() => ref neighbours_data;
     
-    public ref List<GameObject> GetConnections() => ref connections; 
-   
+    public ref List<GameObject> GetConnections() => ref connections;
+
+
+    
+
+    
+
+
+
     public void MoveToTop() 
     {
         foreach(var obj in connections) 
@@ -98,6 +118,8 @@ public class PuzzlePiece : MonoBehaviour
     {
         //if (dataTracker.IsInteractionDisabled())
         //    return;
+        SoundFXManager.instance.PlaySoundClipOnClick(HoverOverSound);
+
 
         if (!MC_ref.Is_holding())
         {
@@ -105,11 +127,14 @@ public class PuzzlePiece : MonoBehaviour
 
             //print("entered" + (SR_ref.color.a == 1));
             // fading on hover
-            if (1 - SR_ref.color.a < hover_light.a)
-            {
-                SR_ref.color -= hover_light;
-                //Thickness_ref.color -= hover_light;
-            }
+            
+            ChangeOutLineState(true);
+            //if (1 - SR_ref.color.a < hover_light.a)
+            //{
+            //    SR_ref.color -= hover_light;
+            //    //transform.GetChild(0).gameObject.SetActive(true);
+            //    //Thickness_ref.color -= hover_light;
+            //}
 
         }
     }
@@ -120,15 +145,19 @@ public class PuzzlePiece : MonoBehaviour
         //if (dataTracker.IsInteractionDisabled())
         //    return; 
 
-
+        
         if (!MC_ref.Is_holding())
         {
             // fading on hover
-            if (SR_ref.color.a < 1) 
-            { 
-                SR_ref.color += hover_light;
-                //Thickness_ref.color += hover_light;
-            }
+
+            if (!MC_ref.ContainsElement(gameObject))
+                ChangeOutLineState(false);
+            //if (SR_ref.color.a < 1) 
+            //{ 
+            //    SR_ref.color += hover_light;
+            //    //transform.GetChild(0).gameObject.SetActive(false);
+            //    //Thickness_ref.color += hover_light;
+            //}
 
         }
     }
@@ -140,29 +169,46 @@ public class PuzzlePiece : MonoBehaviour
             return;
 
         MC_ref.SetHoldedPuzzle(this);
+        //----------------------- play sound ----------------------- 
+        SoundFXManager.instance.PlaySoundClipOnClick(PickPuzzleSound);
+        //----------------------------------------------------------
+
         offset = Camera.main.ScreenToWorldPoint(Input.mousePosition) - gameObject.transform.position;
 
 
         ChangeCollisionState(false);
-        foreach (var t in connections)
+
+        foreach (var puz in MC_ref.Selected_p())
         {
-            t.GetComponent<PuzzlePiece>().ChangeCollisionState(false);
+            var con = puz.GetComponent<PuzzlePiece>().GetConnections();
+            foreach (var t in con)
+            {
+                t.GetComponent<PuzzlePiece>().ChangeCollisionState(false);
+            }
         }
 
-        Is_loocking_for_neighbours = true;
+        Is_looking_for_neighbours = true;
+
+
     }
+
 
     //connect magneted puzzle to <connections> or if not magneted remove puzzle from holded
     private void OnMouseUp()
     {
+        //print("up");
         ChangeCollisionState(true);
-        foreach(var t in connections) 
-        {
-            t.GetComponent<PuzzlePiece>().ChangeCollisionState(true);
-        }
 
+        foreach (var puz in MC_ref.Selected_p())
+        {
+            var con = puz.GetComponent<PuzzlePiece>().GetConnections();
+            foreach (var t in con)
+            {
+                t.GetComponent<PuzzlePiece>().ChangeCollisionState(true);
+            }
+        }
         SR_ref.color += hover_light;
-        Is_loocking_for_neighbours = false;
+        Is_looking_for_neighbours = false;
 
         if (Is_magneting) 
         {
@@ -174,11 +220,11 @@ public class PuzzlePiece : MonoBehaviour
         MC_ref.UnsetHoldedPuzzle();
     }
 
+
     public void ChangeCollisionState(bool state) 
     {
         collision.enabled = state;
     }
-
 
     private void OnMouseDrag()
     {
@@ -189,7 +235,7 @@ public class PuzzlePiece : MonoBehaviour
         Vector3 change = (Vector2)mousePos - (Vector2)gameObject.transform.position - offset;
 
         // magnetting puzzle logic
-        if (closest_connection != null)
+        if (closest_connection != null && MC_ref.Selected_p().Count < 2)
         {   
             if (Is_magneting)
             {
@@ -211,33 +257,48 @@ public class PuzzlePiece : MonoBehaviour
         }
     }
 
-    // do not use transform.position+= or any other method to meve puzzles
-    // used for puzzle moving(moves all connected puzzles) --- need to be optimized ------------------------- (11)
+    // do not use transform.position+= or any other method to move puzzles
     public void MovePuzzle(Vector3 change) 
     {
-        foreach (var t in neighbours_data)
+        foreach (var puz in MC_ref.Selected_p())
         {
-            t.MovePos(change);
-        }
-        foreach (var c in connections)
-        {
-            c.gameObject.transform.position += change;
+            var con = puz.GetComponent<PuzzlePiece>().GetConnections();
+            var nd = puz.GetComponent<PuzzlePiece>().GetNeighboursData();
+
+            foreach (var t in nd)
+            {
+                t.MovePos(change);
+            }
+            foreach (var c in con)
+            {
+                c.transform.position += change;
+            }
         }
     }
+
+    public void ChangeOutLineState(bool state) 
+    {
+        foreach(var t in connections) 
+        {
+            t.transform.GetChild(0).gameObject.SetActive(state);
+        }
+    }
+
 
     // magnet to required possition of clossest neighbour.
     private void MagnetToPuzzle() 
     {
+        if (MC_ref.Selected_p().Count > 1) return;
         Is_magneting = true;
         Vector2 slide = closest_connection.GetSlide();
         MovePuzzle(slide);
     }
 
- 
     private void ConnectPuzzle(PuzzlePiece p1) 
     {
-        //print("connecting puzzles " + this.GetIndex() + " and " + p1.GetIndex());
-
+        //----------------------- play sound ----------------------- 
+        SoundFXManager.instance.PlaySoundClipOnClick(ConnectionSound);
+        //----------------------------------------------------------
         //adding holded tiles to connections
         foreach (var obj in connections)
         {
@@ -269,7 +330,6 @@ public class PuzzlePiece : MonoBehaviour
         dataTracker.SetMaxComb(connections.Count);
     }
 
-
     // method sets <clossest connection> to puzzle which closest to holded. sets null if no collision with neigbours detected.
     public void CheckCollisionWithNeighbours () 
     {
@@ -293,17 +353,19 @@ public class PuzzlePiece : MonoBehaviour
     private void FixedUpdate()
     {
         // checking if holded puzzle collides with neighbours via connection point
-        if (Is_loocking_for_neighbours)
+        if (Is_looking_for_neighbours)
         {
             CheckCollisionWithNeighbours();
         }
+
+        
+
         //if (dataTracker.IsInteractionDisabled() && SR_ref.color.a < 1) 
         //{
         //    SR_ref.color += hover_light;
         //}
                 
     }
-
 
     // method adding neighbour to list, not adding if neighbour with same index already exists
     // do not recoment call it outside of puzzle generation
@@ -318,6 +380,32 @@ public class PuzzlePiece : MonoBehaviour
         }
         var temp_cp = new ConnectionPoint(index, pos,col);
         neighbours_data.Add(temp_cp);       
+    }
+
+    public void ConnectOnLoad(Vector3 pos) 
+    {
+        float md_temp = magnet_distance;
+        magnet_distance = 0.0001f;
+        if (dataTracker.IsInteractionDisabled())
+            return;
+
+        MC_ref.SetHoldedPuzzle(this);
+
+        ChangeCollisionState(false);       
+        MovePuzzle(pos - (Vector3)GetCenter());
+        ChangeCollisionState(true);
+
+        for (int i = 0; i < neighbours_data.Count; i++)
+        {
+            CheckCollisionWithNeighbours();
+            if (closest_connection != null)
+                ConnectPuzzle(closest_connection.ReturnGameobjectByCollider().GetComponent<PuzzlePiece>());
+            else
+                break;
+        }
+        closest_connection = null;
+        MC_ref.UnsetHoldedPuzzle();
+        magnet_distance = md_temp;
     }
 
     

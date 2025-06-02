@@ -1,26 +1,105 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Rendering;
+using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Linq;
+using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 
 public class PuzzleDataTracker : MonoBehaviour
 {
     private int number_of_puzzles_in_scene;
     private int current_max_of_combined_puzzles = 1;
     private Material image_mat;
+
+    [SerializeField] private float auto_save_delay = 60f;
     [SerializeField] private bool interaction_disabled = false;
+    [SerializeField] private bool isAutoSaving = false;
+    [SerializeField] private int number_of_autosaves = 10;
+    [SerializeField] private UIBehaviour UIB_ref;
+
+    private string save_path;
+    private GeneralSettings _GeneralSettings;
+
+    PuzzleGeneration pg;
+    
 
     public bool IsInteractionDisabled() => interaction_disabled;
     public void SetInteractionBool(bool set) 
     {
         interaction_disabled = set;
     }
+
     private void Awake()
     {
         image_mat = GetComponent<SpriteRenderer>().material;
         image_mat.SetFloat("_StartAnim", 0);
         image_mat.SetFloat("_CurAnimSecond", 0);
+
+        pg = GetComponent<PuzzleGeneration>();
+
+
+        var _Main_canvas = GameObject.FindGameObjectWithTag("MainCanvas");
+        _GeneralSettings = _Main_canvas.GetComponent<SettingsInit>().ReloadGeneralSettings();        
+
+        //print(_GeneralSettings);
+
+        isAutoSaving = _GeneralSettings.autosavetoggle;
+        auto_save_delay = _GeneralSettings.autosaveFrequency * 30;
+        number_of_autosaves = _GeneralSettings.number_of_auto_saves;
+        print($"autosave is {isAutoSaving} delay between saves {auto_save_delay} number of autosaves {number_of_autosaves}");
+
+        
+        if (isAutoSaving == true) StartCoroutine(AutoSave());
+
+        
     }
+
+    IEnumerator AutoSave() 
+    {
+        yield return new WaitUntil(() => !pg.Is_Loading());
+        save_path = pg.GetPLD().GetSavePath();
+        //GetLoadingData().SaveToFile("save_test");
+        while (isAutoSaving && SceneManager.GetActiveScene().name == "MainGame" && auto_save_delay >= 30) 
+        {
+            yield return new WaitForSecondsRealtime(auto_save_delay);
+
+            print("QuickSave!!");
+            Save();
+        }
+    }
+
+    public void Save() 
+    {
+        var t = pg.GetPLD();
+        string name = t.GetImageName().Length > 21 ? t.GetImageName()[0..20] : t.GetImageName();
+        GetLoadingData().SaveToFile($"QS_{name}_{DateTime.Now:yyyy_MM_dd_HH_mm}");
+
+        string[] fileNames = Directory.GetFiles(save_path);
+        List<string> quicksaves = new List<string>();
+
+        foreach (string fileName in fileNames)
+        {
+            //print(fileName[0..8]);
+            if (Path.GetFileNameWithoutExtension(fileName).Length > 3 && Path.GetFileNameWithoutExtension(fileName)[0..3] == "QS_")
+            {
+                quicksaves.Add(fileName);
+
+            }
+        }
+        if (quicksaves.Count > number_of_autosaves)
+        {
+            quicksaves = quicksaves.OrderByDescending(file => File.GetLastWriteTime(file)).ToList();
+
+            for (int i = quicksaves.Count - 1; i >= number_of_autosaves; i--)
+            {
+                File.Delete(quicksaves[i]);
+            }
+        }
+    }
+
+
 
     public void SetMaxComb(int n) 
     {
@@ -34,6 +113,11 @@ public class PuzzleDataTracker : MonoBehaviour
 
         }
         
+    }
+
+    public PuzzleLoadingData GetLoadingData() 
+    {
+        return pg.GetPLD();
     }
 
     public void SetNumberOfPuzzles(int n) 
@@ -55,6 +139,8 @@ public class PuzzleDataTracker : MonoBehaviour
 
         pg.DisableShader();
 
+        StartCoroutine(MarkPuzzleAsComplete());
+
         for (float i = 0; i < 1.1f;) 
         {
             image_mat.SetFloat("_CurAnimSecond", i);
@@ -69,23 +155,51 @@ public class PuzzleDataTracker : MonoBehaviour
         yield return null;
     }
 
+    private IEnumerator MarkPuzzleAsComplete() 
+    {
+        yield return null;
+        try 
+        {
+            SetPuzzleAsComplete(pg.GetPLD().GetImageNameWithExtention());
+        }
+        catch(IOException e) 
+        {
+            Debug.LogError($"Failed to create or write to the file: {e.Message}");
+        }
+    }
+
+    public void SetPuzzleAsComplete(string puzzle_name)
+    {
+
+        Dictionary<string, bool> PuzzleCompletion = new Dictionary<string, bool>();
+        string path = pg.GetPLD().GetJournalName();
+        string jsonFile = File.ReadAllText(Path.Combine(path, $"{Path.GetFileName(path)}_completion.json"));
+
+        DictionaryWrapper wrapper = JsonUtility.FromJson<DictionaryWrapper>(jsonFile);
+        PuzzleCompletion = wrapper.ToDictionary();
+
+        try
+        {
+            PuzzleCompletion[puzzle_name] = true;
+            
+        }
+        catch (IOException e)
+        {
+            Debug.LogError($"Failed to find puzzle with name {puzzle_name} : {e.Message}");
+        }
+ 
+        wrapper.FromDictionary(PuzzleCompletion);
+        jsonFile = JsonUtility.ToJson(wrapper);
+
+        try
+        {
+            File.WriteAllText(Path.Combine(path, $"{Path.GetFileName(path)}_completion.json"), jsonFile);
+        }
+        catch (IOException e)
+        {
+            Debug.LogError($"Failed to create or write to the file: {e.Message}");
+        }
+
+    }
+
 }
-
-
-
-//void mainImage(out vec4 fragColor, in vec2 fragCoord)
-//{
-//    // Normalized pixel coordinates (from 0 to 1)
-//    vec2 uv = fragCoord / iResolution.xy * 2.0 - 1.0;
-
-//    // Time varying pixel color
-//    float d = length(uv);
-
-//    d -= log(iTime + 1.0);
-//    //d = abs(d);
-
-//    d = smoothstep(0.015, 0.03, d);
-
-//    // Output to screen
-//    fragColor = vec4(1.0 - d, 1.0 - d, 1.0 - d, 1);
-//}

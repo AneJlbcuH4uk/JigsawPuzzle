@@ -20,15 +20,111 @@ MonoBehaviour:
     - rid: 314913540942331945
   m_TableData:
   - m_Id: 13382025216
-    m_Localized: 
+    m_Localized: Maskentyp
     m_Metadata:
       m_Items:
       - rid: 314913540942331945
   - m_Id: 156051275776
-    m_Localized: 
+    m_Localized: Puzzle-Anzahl
     m_Metadata:
       m_Items:
       - rid: 314913540942331945
+  - m_Id: 2469749487403008
+    m_Localized: Systemuhr anzeigen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 719734347759616
+    m_Localized: Sprache
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56129925154963456
+    m_Localized: Automatisches Speichern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56130212829691904
+    m_Localized: "H\xE4ufigkeit der automatischen Speicherung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56130402827468800
+    m_Localized: Anzahl automatischer Speicherungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3519950192640
+    m_Localized: Speichern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543534269890560
+    m_Localized: "Gesamtlautst\xE4rke"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543599336128512
+    m_Localized: "Musiklautst\xE4rke"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543640960401408
+    m_Localized: "Effektlautst\xE4rke"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543755171299328
+    m_Localized: Spiel stummschalten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2543777464025088
+    m_Localized: Beim Minimieren stummschalten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2279497367552
+    m_Localized: Vollbildmodus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2451954565120
+    m_Localized: "Bildschirmverh\xE4ltnis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2494841323520
+    m_Localized: "Bildschirmaufl\xF6sung"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2470893349601280
+    m_Localized: Ja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2470919614332928
+    m_Localized: Nein
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5778938544619520
+    m_Localized: "Sie haben ungespeicherte \xC4nderungen. M\xF6chten Sie sie behalten?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56549541098389504
+    m_Localized: Beenden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56549687836114944
+    m_Localized: Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56548092570337280
+    m_Localized: Abgeschlossene Puzzle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56131872318652416
+    m_Localized: Umbenennen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56132029898653696
+    m_Localized: Abbrechen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56131107646701568
+    m_Localized: Letzter Speicherstand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2471265065598976
+    m_Localized: "Bist du sicher, dass du das Spiel verlassen m\xF6chtest?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

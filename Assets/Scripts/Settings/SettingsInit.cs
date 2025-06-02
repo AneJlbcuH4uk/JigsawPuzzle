@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -17,18 +18,19 @@ public enum Settings
 
 public class SettingsInit : MonoBehaviour
 {
-    public string path_to_graphics_settings;
-    public string path_to_sound_settings;
-    public string path_to_general_settings;
-    public string path_to_input_settings;
+    public static string path_to_graphics_settings;
+    public static string path_to_sound_settings;
+    public static string path_to_general_settings;
+    public static string path_to_input_settings;
 
     private GraphicSettings _graphicSettings;
     private SoundSettings _soundSettings;
-    private InputSettings _inputSettings;
+    //private InputSettings _inputSettings;
     private GeneralSettings _generalSettings;
 
-    private string[] settings_type = new string[] { "GeneralSettings.json","GraphicsSettings.json", "SoundSettings.json", "InputSettings.json",  };
+    private readonly string[] settings_type = new string[] { "GeneralSettings.json","GraphicsSettings.json", "SoundSettings.json", "InputSettings.json",  };
 
+    [SerializeField] private AudioMixer mixer;
 
     void Start()
     {
@@ -38,28 +40,12 @@ public class SettingsInit : MonoBehaviour
         path_to_input_settings = GetPath(Settings.Input);
 
         // Call the method to set or load settings.
-        LoadSettings(ref _graphicSettings, path_to_graphics_settings, (graphicSettings) =>
-        {
-            graphicSettings.CreateNew((int)FullScreenMode.ExclusiveFullScreen, new Vector2Int(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height));
-        });
-
-        LoadSettings(ref _soundSettings, path_to_sound_settings, (SoundSettings) =>
-        {
-            SoundSettings.CreateNew(0.5f,0.5f,0.5f,false,false);
-        });
-        
-        LoadSettings(ref _inputSettings, path_to_input_settings, (inputSettings) =>
-        {
-            inputSettings.CreateNew();
-        });
-        
-        LoadSettings(ref _generalSettings, path_to_general_settings, (generalSettings) =>
-        {
-            generalSettings.CreateNew("en",false);
-        });
+        _graphicSettings = ReloadGraphicsSettings();
+        _soundSettings = ReloadSoundSettings();
+        _generalSettings = ReloadGeneralSettings();
+        //_inputSettings = ReloadInputSettings();
 
         SetLoaded();
-
     }
 
     private void SetLoaded() 
@@ -67,10 +53,13 @@ public class SettingsInit : MonoBehaviour
         //graphics
         Screen.fullScreenMode = (FullScreenMode)_graphicSettings.FullscreenMode;
         Screen.SetResolution(_graphicSettings.ScreenResolutionWidth, _graphicSettings.ScreenResolutionHeight, Screen.fullScreenMode);
-
+        //print(_graphicSettings.ScreenResolutionWidth + " + " + _graphicSettings.ScreenResolutionHeight);
         //general
         StartCoroutine(WaitForLocalizationInitialization());
-
+        //sound
+        mixer.SetFloat("MasterVolume",ChangeSoundSettings.UnNormilizeSoundValue(_soundSettings.GeneralSound));
+        mixer.SetFloat("MusicVolume", ChangeSoundSettings.UnNormilizeSoundValue(_soundSettings.MusicSound));
+        mixer.SetFloat("EffectsVolume", ChangeSoundSettings.UnNormilizeSoundValue(_soundSettings.EffectsSound));
     }
 
     private IEnumerator WaitForLocalizationInitialization()
@@ -103,7 +92,7 @@ public class SettingsInit : MonoBehaviour
             {
                 // Set the selected locale
                 LocalizationSettings.SelectedLocale = locale;
-                Debug.Log("Locale set to: " + locale.LocaleName);
+                //Debug.Log("Locale set to: " + locale.LocaleName);
                 return;
             }
         }
@@ -149,7 +138,7 @@ public class SettingsInit : MonoBehaviour
             {
                 // Write the settings to the file.
                 File.WriteAllText(path, jsonSettings);
-                Debug.Log($"{typeof(T).Name} settings file created and written successfully.");
+                //Debug.Log($"{typeof(T).Name} settings file created and written successfully.");
             }
             catch (IOException e)
             {
@@ -165,13 +154,43 @@ public class SettingsInit : MonoBehaviour
     {
         string set = File.ReadAllText(path);
         settingsInstance = JsonUtility.FromJson<T>(set);
-        Debug.Log($"{typeof(T).Name} loaded successfully.");
+        //Debug.Log($"{typeof(T).Name} loaded successfully.");
     }
 
-    public GraphicSettings GetGraphicsSettings() => _graphicSettings;
-    public SoundSettings GetSoundSettings() => _soundSettings;
-    public GeneralSettings GetGeneralSettings() => _generalSettings;
-    public InputSettings GetInputSettings() => _inputSettings;
+    public GraphicSettings ReloadGraphicsSettings() 
+    {
+        LoadSettings(ref _graphicSettings, path_to_graphics_settings, (graphicSettings) =>
+        {
+            graphicSettings.CreateNew((int)FullScreenMode.ExclusiveFullScreen, new Vector2Int(Screen.mainWindowDisplayInfo.width, Screen.mainWindowDisplayInfo.height));
+        });
+        return _graphicSettings;
+    }
+    public SoundSettings ReloadSoundSettings() 
+    {
+        LoadSettings(ref _soundSettings, path_to_sound_settings, (SoundSettings) =>
+        {
+            SoundSettings.CreateNew(0.5f, 0.5f, 0.5f, false, false);
+        });
+        return _soundSettings;
+    }
+    public GeneralSettings ReloadGeneralSettings() 
+    {
+        LoadSettings(ref _generalSettings, path_to_general_settings, (generalSettings) =>
+        {
+            generalSettings.CreateNew("en", false, true, 4, 10);
+        });
+        return _generalSettings;
+    }
+
+    //public InputSettings ReloadInputSettings() 
+    //{
+    //    LoadSettings(ref _inputSettings, path_to_input_settings, (inputSettings) =>
+    //    {
+    //        inputSettings.CreateNew();
+    //    });
+    //    return _inputSettings;
+    //}
+
 
     public void SaveSettings<T>(T settingsInstance, Settings type) where T : class
     {
@@ -181,7 +200,7 @@ public class SettingsInit : MonoBehaviour
         {
             // Write the settings to the file.
             File.WriteAllText(GetPath(type), jsonSettings);
-            Debug.Log($"{typeof(T).Name} settings file created and written successfully.");
+            //Debug.Log($"{typeof(T).Name} settings file created and written successfully.");
         }
         catch (IOException e)
         {

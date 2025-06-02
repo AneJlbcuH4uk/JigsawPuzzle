@@ -46,7 +46,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 719734347759616
-    m_Localized: Change Langage
+    m_Localized: Langage
     m_Metadata:
       m_Items: []
   - m_Id: 2469749487403008
@@ -83,6 +83,46 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2543777464025088
     m_Localized: Mute on Minimize
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5778938544619520
+    m_Localized: You have unsaved changes. Want to keep them?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56129925154963456
+    m_Localized: AutoSave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56130212829691904
+    m_Localized: Autosaves frequency
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56130402827468800
+    m_Localized: Max Number of Autosaves
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56131107646701568
+    m_Localized: Last Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56131872318652416
+    m_Localized: Rename
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56132029898653696
+    m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56548092570337280
+    m_Localized: Puzzles Completed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56549541098389504
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 56549687836114944
+    m_Localized: Settings
     m_Metadata:
       m_Items: []
   references:

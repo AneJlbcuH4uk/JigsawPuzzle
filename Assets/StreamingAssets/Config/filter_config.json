@@ -1,0 +1,36 @@
+{
+    "keys": [
+        "ivan",
+        "ivan — копия",
+        "ivan — копия (2)",
+        "ivan — копия — копия",
+        "TestCold",
+        "TestCold — копия",
+        "TestCold — копия (2)",
+        "TestCold — копия — копия",
+        "TestPuzzle1",
+        "TestPuzzle1 — копия",
+        "TestPuzzle1 — копия (2)",
+        "TestPuzzle1 — копия — копия",
+        "ivan2",
+        "ivan3",
+        "ivan4"
+    ],
+    "values": [
+        false,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true
+    ]
+}

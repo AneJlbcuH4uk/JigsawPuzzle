@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Puzzle
   - GameManager
+  - LoadingData
+  - LoadingScreen
+  - MainCanvas
+  - SelectionBox
+  - SaveFilesHolder
   layers:
   - Default
   - TransparentFX

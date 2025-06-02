@@ -1,20 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MaskTest : MonoBehaviour
 {
     [SerializeField] Vector2Int resolution = new Vector2Int(1920, 1080);
-    //[SerializeField] Color fillColor = Color.red; // Default fill color
     [SerializeField] int maxJumpDistance = 2;
+    [SerializeField] float fillStepDelay = 0.001f;  // Delay between each flood fill step
+    [SerializeField] MaskType maskType;
+
 
     private Texture2D outputTexture;
 
     void Start()
     {
-        var mg = new MaskGenerator(resolution, maxJumpDistance, MaskType.Classic);
+        var mg = new MaskGenerator(resolution, maxJumpDistance, maskType);
         var maskTexture = mg.GetMask();
         var img = gameObject.GetComponent<Image>();
 
@@ -26,21 +27,15 @@ public class MaskTest : MonoBehaviour
         outputTexture.SetPixels(pixels);
         outputTexture.Apply();
 
-        // Perform flood fill to fill the white areas with different random colors
-        var t = FloodFillWhiteAreas(outputTexture);
-
-        foreach (var o in t)
-        {
-            print(o);
-        }
+        // Start the flood fill process
+        StartCoroutine(FloodFillWhiteAreas(outputTexture));
 
         img.sprite = Sprite.Create(outputTexture, new Rect(0, 0, resolution.x, resolution.y), new Vector2(.5f, .5f));
         img.SetNativeSize();
     }
 
-    private List<RectInt> FloodFillWhiteAreas(Texture2D texture)
+    private IEnumerator FloodFillWhiteAreas(Texture2D texture)
     {
-        
         var puzzle_shapes = new List<RectInt>();
         int width = texture.width;
         int height = texture.height;
@@ -94,6 +89,12 @@ public class MaskTest : MonoBehaviour
                         RecalculateBorderx(px);
                         RecalculateBordery(py);
 
+                        // Apply texture changes and add delay for visualization
+                        texture.SetPixels(pixels);
+                        texture.Apply();
+
+                        yield return new WaitForSeconds(fillStepDelay);  // Delay between steps
+
                         // Add neighboring pixels to stack
                         stack.Push(new Vector2Int(px + 1, py));
                         stack.Push(new Vector2Int(px - 1, py));
@@ -102,7 +103,6 @@ public class MaskTest : MonoBehaviour
                     }
 
                     puzzle_shapes.Add(res);
-
                     areaId++;
 
                     void RecalculateBorderx(int x)
@@ -116,8 +116,6 @@ public class MaskTest : MonoBehaviour
                         res.yMin = res.yMin > y ? y : res.yMin;
                         res.yMax = res.yMax < y ? y : res.yMax;
                     }
-
-
                 }
             }
         }
@@ -127,8 +125,6 @@ public class MaskTest : MonoBehaviour
         texture.Apply();
 
         print(Mathf.Max(visited));
-
-        return puzzle_shapes;
     }
 
     private bool IsWhite(Color c)

@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -25,6 +25,13 @@ public class UIBehaviour : MonoBehaviour
     [SerializeField] private GameObject SettingsMenu;
     [SerializeField] private GameObject ButtonSettings;
     [SerializeField] private GameObject BackToMainMenuButton;
+    [SerializeField] private GameObject GameLoadButton;
+    [SerializeField] private GameObject GameLoadMenu;
+    [SerializeField] private GameObject JournalProgresText;
+    [SerializeField] private UIJournalFilter Filter;
+    [SerializeField] private GameObject HiddenJournalsHolder;
+
+    //private PuzzleGeneration PG;
 
     private GameObject Opened_Journal = null;
 
@@ -36,7 +43,7 @@ public class UIBehaviour : MonoBehaviour
     // list of paths to image directories
     [SerializeField] private List<string> puzzle_sets;
 
-
+    private PuzzleLoadingData ManagerDataRef;
     private int number_of_journals;
     private float _delta_for_1_sec_anim;
     private List<GameObject> Journals; 
@@ -54,18 +61,24 @@ public class UIBehaviour : MonoBehaviour
     // Image UIelement => UIElement which is moved
     // float duration => duration in seconds how long to move object towards point
     // bool deactivate => set true if gona setactive(false) at the end of movement
+
+
     private IEnumerator MoveImage(Vector2 direction, Image UIelement, float duration, bool deactivate = false)
     {
-
-        //print("move to " + direction);
         float _current_scale = gameObject.GetComponent<RectTransform>().localScale.y;
-        float number_of_sim_steps = 50 * duration;
-        for (int i = 0; i < number_of_sim_steps; i++)
+        float number_of_sim_steps = (1 / _delta_for_1_sec_anim) * duration;
+        if (duration == 0.0f)
         {
-            UIelement.transform.position += (Vector3)direction * _current_scale * _delta_for_1_sec_anim * (1 / duration);
-            yield return _waitForFixedUpdate;
+            UIelement.transform.position += (Vector3)direction * _current_scale;
         }
-
+        else
+        {
+            for (int i = 0; i < number_of_sim_steps; i++)
+            {
+                UIelement.transform.position += (Vector3)direction * _current_scale * _delta_for_1_sec_anim * (1 / duration);
+                yield return _waitForFixedUpdate;
+            }
+        }
         if (deactivate)
             UIelement.gameObject.SetActive(false);
     }
@@ -79,10 +92,9 @@ public class UIBehaviour : MonoBehaviour
     private IEnumerator RotateImage(float rotation, Image UIelement, float duration, bool deactivate = false)
     {
         float number_of_sim_steps = 50 * duration;
-        //print("trying rotate journal by " + rotation + " degrees");
+     
         for (int i = 0; i < number_of_sim_steps; i++)
         {
-            //print(Quaternion.Euler(0, 0, rotation * _delta_for_1_sec_anim * (1 / duration)));
             UIelement.gameObject.GetComponent<RectTransform>().rotation *= Quaternion.AngleAxis(rotation * _delta_for_1_sec_anim * (1 / duration), Vector3.forward);
             yield return _waitForFixedUpdate;
         }
@@ -91,50 +103,180 @@ public class UIBehaviour : MonoBehaviour
             UIelement.gameObject.SetActive(false);
     }
 
-    private void Start()
+    private IEnumerator Start()
     {
+        ManagerDataRef = GameObject.FindGameObjectWithTag("LoadingData").GetComponent<PuzzleLoadingData>();
         LoadingScreen.transform.GetChild(1).GetComponent<Image>().material.SetFloat("_CurFillPercent", 0.5f);
 
-        puzzle_sets = Directory.GetDirectories(path_to_set_folders).ToList<string>();
-        number_of_journals = puzzle_sets.Count;
-
-        for (int i = 0; i < 4; i++) 
+        if (SceneManager.GetActiveScene().name == "MainMenu")
         {
-            var temp_u = new Vector2(i * 400 - 600, -500);
-            var temp_b = new Vector2(i * 400 - 600, -1000);
-            deff_positions[i] = temp_u;
-            deff_positions[i+4] = temp_b;
+            puzzle_sets = Filter.GetPuzzleSets();
+            //puzzle_sets = Directory.GetDirectories(path_to_set_folders).ToList<string>();
+            number_of_journals = puzzle_sets.Count;
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 temp_u, temp_b;
+                if (i > 0 && i < 3)
+                {
+                    temp_u = new Vector2(i * 400 - 600, -650);
+                    temp_b = new Vector2(i * 400 - 600, -1100);
+                }
+                else 
+                {
+                    temp_u = new Vector2(i * 400 - 600, -550);
+                    temp_b = new Vector2(i * 400 - 600, -1000);
+                }
+                
+                deff_positions[i] = temp_u;
+                deff_positions[i + 4] = temp_b;
+            }
+
+            _delta_for_1_sec_anim = Time.fixedUnscaledDeltaTime;
+            
+            Journals = new List<GameObject>();
+
+            for (int i = 0; i < number_of_journals; i++)
+            {
+                var j = Instantiate(Journal_pref, PanelJournalHolder.transform.Find("JournalHolder").transform);
+                //j.name += $"{i}";
+                Journals.Add(j);
+                
+            }
+
+            int hidden_journals_count = 0;
+
+            
+            float before = Time.realtimeSinceStartup;
+
+            for (int i = 0; i - hidden_journals_count < number_of_journals; i++)
+            {              
+                var b = Journals[i - hidden_journals_count].GetComponent<Button>();
+                b.onClick.AddListener(OnClickJournalButton);
+
+                var t = Journals[i - hidden_journals_count].GetComponent<RectTransform>();
+                t.rotation = Quaternion.Euler(0, 0, Random.Range(-15, 15));
+                
+                Journals[i - hidden_journals_count].GetComponent<UIJournalData>().SetImagesPath(puzzle_sets[i]);
+                Filter.SetRef(Journals[i - hidden_journals_count], i);
+
+                // generate Decal
+
+                var decalgen = Journals[i - hidden_journals_count].transform.GetChild(0).GetComponent<JournalDecalGen>();
+
+                StartCoroutine(decalgen.LoadDecal());
+                yield return new WaitUntil(() => decalgen.Is_Decal_created());
+
+                t.gameObject.SetActive(false);
+
+                bool state = Filter.GetJournalState(i);
+                UpdateJournal(Journals[i - hidden_journals_count], state, false);
+                if (!state) hidden_journals_count++;
+
+                
+            }
+
+            print($"journal generation time = {Time.realtimeSinceStartup - before}");
+
+            number_of_journal_pages = Mathf.CeilToInt((float)Journals.Count / 8);
+
+            RightPage = JournalUI.transform.GetChild(3).gameObject;
+            LeftPage = JournalUI.transform.GetChild(2).gameObject;
+
+            old_pos_of_settings_button = ButtonSettings.GetComponent<RectTransform>().anchoredPosition;
+            old_pos_of_load_button = GameLoadButton.GetComponent<RectTransform>().anchoredPosition;
+
+            // add loading screen that prevents from interacting with the game before everything loaded
+            print("everything loaded");
+
+            yield return null;
         }
 
-        _delta_for_1_sec_anim = Time.fixedUnscaledDeltaTime;
-
-        Journals = new List<GameObject>();
-
-        for (int i = 0; i < number_of_journals; i++) 
-        {
-            Journals.Add(Instantiate(Journal_pref, PanelJournalHolder.transform.Find("JournalHolder").transform));
-        }
-
-        for (int i = 0; i < number_of_journals; i++)
-        {
-            var b = Journals[i].GetComponent<Button>();
-            b.onClick.AddListener(OnClickJournalButton);
-
-            var t = Journals[i].GetComponent<RectTransform>();
-            t.rotation = Quaternion.Euler(0,0, Random.Range(-15,15));
-            t.gameObject.SetActive(false);
-
-            Journals[i].GetComponent<UIJournalData>().SetImagesPath(puzzle_sets[i]);
-        }
-        number_of_journal_pages = Mathf.CeilToInt((float)Journals.Count / 8);
-
-        RightPage = JournalUI.transform.GetChild(2).gameObject;
-        LeftPage = JournalUI.transform.GetChild(1).gameObject;
-
-        old_pos_of_settings_button = ButtonSettings.GetComponent<RectTransform>().anchoredPosition;
 
     }
-    
+
+
+    // make sure that UpdateJournals() calling only once if want to return animation
+    public void UpdateJournals()
+    {
+        int startIndex = _cur_journal_page * 8;
+        int endIndex = startIndex + 8;
+
+        for (int i = startIndex; i < endIndex; i++)
+        {
+            if (i < Journals.Count)
+            {                
+                Journals[i].SetActive(true);
+                Vector2 dir = deff_positions[i % 8] - Journals[i].GetComponent<RectTransform>().anchoredPosition;
+
+                StartCoroutine(MoveImage(dir, Journals[i].GetComponent<Image>(), 0.0f));
+                Journals[i].GetComponent<UIJournalData>().ClearData();
+            }
+        }
+        if(_cur_journal_page * 8 - number_of_journals >= 0 && _cur_journal_page!= 0) 
+        {
+            OnClickPrevPage();
+        }
+
+        CheckPagesButtons();
+    }
+
+
+    public void UpdateJournal(GameObject j, bool state, bool forceUpdate = true) 
+    {
+        //print("UpdateJournal is called");
+
+        if (state)
+        {
+            //j.transform.parent = PanelJournalHolder.transform.Find("JournalHolder").transform;
+            j.transform.SetParent(PanelJournalHolder.transform.Find("JournalHolder").transform, false);
+
+            if (!Journals.Contains(j))
+            {
+                Journals.Add(j);
+            }
+
+            if (!Is_OnPage(j))
+            {            
+                j.SetActive(false);
+            }
+
+        }
+        else
+        {
+            if (!Is_OnPage(j))
+            {
+                Journals[_cur_journal_page * 8].SetActive(false);  // probably need changes 
+            }
+
+            j.transform.SetParent(HiddenJournalsHolder.transform, false);
+            //j.transform.parent = HiddenJournalsHolder.transform;
+            
+            if (Journals.Contains(j))
+            {
+                Journals.Remove(j);
+            }
+
+            
+        }
+
+        number_of_journals = Journals.Count;
+        number_of_journal_pages = Mathf.CeilToInt((float)Journals.Count / 8);
+
+        if(forceUpdate) UpdateJournals();
+    }
+
+    private bool Is_OnPage(GameObject j) 
+    {
+        int startIndex = _cur_journal_page * 8;
+        int endIndex = Mathf.Min(startIndex + 8,Journals.Count);
+
+        //print(startIndex+ " | " + endIndex +" | "+ Journals.Count);
+
+        return Journals.FindIndex(startIndex,endIndex - startIndex, obj => obj == j) != -1;
+    }
+
+
     // __________________________________________________________________________________________
     // logic of lower half of UI regarding Journals and their movement  
 
@@ -165,6 +307,11 @@ public class UIBehaviour : MonoBehaviour
 
         for (int i = startIndex; i < endIndex; i++)
         {
+            if(Journals.Count == 0) 
+            {
+                break;
+            }
+
             if (i < Journals.Count)
             {
                 Journals[i].SetActive(true);
@@ -174,9 +321,15 @@ public class UIBehaviour : MonoBehaviour
             }
         }
 
+        CheckPagesButtons();
+    }
+
+    private void CheckPagesButtons() 
+    {
         ButtonPrev.SetActive(_cur_journal_page > 0);
         ButtonNext.SetActive(_cur_journal_page + 1 < number_of_journal_pages);
     }
+
 
     //scrol menu back to main (upper half) hides instantiated journals
     public void OnClickBackToMainMenuButton() 
@@ -189,6 +342,11 @@ public class UIBehaviour : MonoBehaviour
         StartCoroutine(MoveBackGround(Vector2.down * 1080, 0.25f));
         for (int i = _cur_journal_page * 8; i < _cur_journal_page * 8 + 8 && i < number_of_journals; i++)
         {
+            if(Journals.Count == 0) 
+            {
+                break;
+            }
+
             StartCoroutine(MoveImage(-Journals[i].GetComponent<RectTransform>().anchoredPosition, Journals[i].GetComponent<Image>(), 0.25f,true));
             //StartCoroutine(RotateImage(Journals[i].GetComponent<UIJournalData>().GetAngle(), Journals[i].GetComponent<Image>(), 0.5f));
             Journals[i].GetComponent<UIJournalData>().ClearData();
@@ -217,6 +375,10 @@ public class UIBehaviour : MonoBehaviour
 
         for(int i = _cur_journal_page * 8; i < _cur_journal_page * 8 + 8 && i < number_of_journals; i++) 
         {
+            if (Journals.Count == 0)
+            {
+                break;
+            }
             Journals[i].SetActive(true);
             StartCoroutine(MoveImage(deff_positions[i%8], Journals[i].GetComponent<Image>(), anim_delay * 2));
             //StartCoroutine(RotateImage(-Journals[i].GetComponent<UIJournalData>().GetAngle(), Journals[i].GetComponent<Image>(), 0.5f));
@@ -243,10 +405,15 @@ public class UIBehaviour : MonoBehaviour
     private int cur_page = 0;
     public void OnClickJournalButton() 
     {
+        print("journal open triggered");
         ButtonClose.SetActive(true);
         Opened_Journal = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var jd = Opened_Journal.GetComponent<UIJournalData>();
         jd.UpdateData();
+
+        Vector2Int progress = jd.GetJournalCompletionNumber();
+        string JournalProgress = $"{progress.x}/{progress.y}({(float)progress.x/ (float)progress.y * 100:F1}%)";
+        JournalProgresText.GetComponent<TMP_Text>().text = JournalProgress;
 
         // move journal to center of screen
         Vector2 centerOfScreen = new Vector2(0, -1080)/2;
@@ -356,7 +523,7 @@ public class UIBehaviour : MonoBehaviour
                 if (data[i] != null)
                 {
                     photo.gameObject.SetActive(true);
-                    StartCoroutine( photo.GetComponent<UIPuzzleData>().SetUIPuzzleData(data[i]));
+                    StartCoroutine(photo.GetComponent<UIPuzzleData>().SetUIPuzzleData(data[i], jd.is_puzzle_completed(Path.GetFileName(data[i].Image))));
                 }
                 else
                 {
@@ -384,25 +551,31 @@ public class UIBehaviour : MonoBehaviour
         JournalUI.SetActive(false);
     }
 
+    //PuzzleLoadingData new_pld;
+
+    
+
+
     // Starts selected puzzle with set parameters on click on choosen image
     public void OnClickStartPuzzleButton() 
     {
+        
+        //PuzzleLoadingData new_pld = new PuzzleLoadingData();
         var data = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<UIPuzzleData>();
-        PuzzleLoadingData.SetData(data);
-        StartCoroutine(LoadSceneAsync(PuzzleLoadingData.scene_name));
+        ManagerDataRef.SetData(data);
+
+
+        StartCoroutine(LoadSceneAsync(ManagerDataRef.scene_name));
         
     }
 
     IEnumerator LoadSceneAsync(string name) 
     {
-        yield return null;
+        yield return new WaitUntil(ManagerDataRef.IsImageLoaded);
         var im = LoadingScreen.transform.GetChild(1).GetComponent<Image>();
         im.material.SetFloat("_CurFillPercent", 0);
-
-        im.sprite = Sprite.Create(PuzzleLoadingData.GetTexture(), new Rect(0, 0, PuzzleLoadingData.GetTexture().width, PuzzleLoadingData.GetTexture().height), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect);
-
-
-        im.rectTransform.sizeDelta = PuzzleLoadingData.GetImageMeasures();
+        im.sprite = Sprite.Create(ManagerDataRef.GetTexture(), new Rect(0, 0, ManagerDataRef.GetTexture().width, ManagerDataRef.GetTexture().height), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect);
+        im.rectTransform.sizeDelta = ManagerDataRef.GetImageMeasures();
 
         AsyncOperation op = SceneManager.LoadSceneAsync(name, LoadSceneMode.Single);
         LoadingScreen.SetActive(true);
@@ -434,25 +607,113 @@ public class UIBehaviour : MonoBehaviour
         }
     }
 
+
+    public int wait_till_confirm = 4;
+    public bool unsaved_in_menu = false;
+
+    public void ContinueAnimation() 
+    {
+        //print(unsaved_in_menu);
+        if (unsaved_in_menu)
+        {
+            wait_till_confirm = 0;
+            unsaved_in_menu = false;
+        }
+        else
+        {
+            unsaved_in_menu = false;
+        }
+    }
+
+    public void SubtractAnimationCounter(int val = 1)
+    {
+        wait_till_confirm -= val;
+    }
+
+    public void RefreshAnimationCounter() 
+    {
+        wait_till_confirm = 4;
+        //print(wait_till_confirm);
+    }
+
     public void CloseSettingsMenu() 
     {
         if (SettingsMenu.activeSelf)
-        {
-            SettingsMenu.SetActive(false);
-            ButtonSettings.SetActive(true);
-            StartCoroutine(MoveImage(old_pos_of_settings_button - ButtonSettings.GetComponent<RectTransform>().anchoredPosition,
-                                     ButtonSettings.GetComponent<Image>(), 0.25f, false));
-
-            StartCoroutine(RotateImage(40f, ButtonSettings.GetComponent<Image>(), 0.25f));
+        {        
+            StartCoroutine(ReturnMenuBack());
             //StartCoroutine(ChangeStateWithDelay(ButtonSettings,0.25f,true));
         }
     }
+
+    private IEnumerator ReturnMenuBack() 
+    {
+        //print(wait_till_confirm);
+        while (wait_till_confirm != 0)
+        {
+            yield return null;
+        }
+        RefreshAnimationCounter();
+
+        SettingsMenu.SetActive(false);
+        ButtonSettings.SetActive(true);
+
+        StartCoroutine(MoveImage(old_pos_of_settings_button - ButtonSettings.GetComponent<RectTransform>().anchoredPosition,
+                                     ButtonSettings.GetComponent<Image>(), 0.25f, false));
+
+        StartCoroutine(RotateImage(40f, ButtonSettings.GetComponent<Image>(), 0.25f));
+
+        StopCoroutine(ReturnMenuBack());
+    }
+
 
     private IEnumerator ChangeStateWithDelay(GameObject obj, float delay, bool state) 
     {
         yield return new WaitForSeconds(delay);
         obj.SetActive(state);
     }
+
+
+    //-------------------------------------------------------------------------------
+
+    Vector2 center_coord_for_load_button = new Vector2(1920, -1080) / 2;
+    Vector2 old_pos_of_load_button;
+    public void OpenLoadMenu()
+    {
+        if (!GameLoadMenu.activeSelf)
+        {
+            //ButtonSettings.SetActive(false);
+            StartCoroutine(MoveImage(center_coord_for_load_button - GameLoadButton.GetComponent<RectTransform>().anchoredPosition,
+                                     GameLoadButton.GetComponent<Image>(), 0.25f, true));
+            StartCoroutine(RotateImage(40f, GameLoadButton.GetComponent<Image>(), 0.25f));
+
+            StartCoroutine(ChangeStateWithDelay(GameLoadMenu, 0.25f, true));
+        }
+    }
+
+    public void CloseLoadMenu()
+    {
+        if (GameLoadMenu.activeSelf)
+        {
+            GameLoadMenu.SetActive(false);
+            GameLoadMenu.GetComponent<LoadMenuUI>().ResetState();
+            StartCoroutine(MoveImage(old_pos_of_load_button - GameLoadButton.GetComponent<RectTransform>().anchoredPosition,
+                                     GameLoadButton.GetComponent<Image>(), 0.25f, false));
+
+            StartCoroutine(RotateImage(-40f, GameLoadButton.GetComponent<Image>(), 0.25f));
+            //StartCoroutine(ChangeStateWithDelay(ButtonSettings,0.25f,true));
+            GameLoadButton.SetActive(true);
+        }
+    }
+
+    public void OnSaveLoadClick() 
+    {
+        StartCoroutine(LoadSceneAsync(ManagerDataRef.scene_name));
+    }
+
+
+    
+    
+
 
 
 }

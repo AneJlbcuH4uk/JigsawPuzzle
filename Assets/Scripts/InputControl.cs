@@ -11,7 +11,7 @@ public class CameraControl : MonoBehaviour
     [SerializeField] private InGameUi EscapeMenuUI;
     [SerializeField] private Vector2 zoom_limits = new Vector2 (3,20);
 
-    private Camera camera;  // instance of main scene camera
+    private new Camera camera;  // instance of main scene camera
     
     private Vector3 offset; 
     private Vector2 change;
