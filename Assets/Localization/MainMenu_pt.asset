@@ -122,6 +122,10 @@ MonoBehaviour:
     m_Localized: Tem certeza de que deseja sair?
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Localized: "Lista de cole\xE7\xF5es"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

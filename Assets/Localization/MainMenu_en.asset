@@ -125,6 +125,10 @@ MonoBehaviour:
     m_Localized: Settings
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Localized: Collections list
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

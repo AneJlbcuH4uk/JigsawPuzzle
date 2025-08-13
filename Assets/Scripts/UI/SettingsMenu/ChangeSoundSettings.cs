@@ -22,13 +22,19 @@ public class ChangeSoundSettings : MonoBehaviour
     [SerializeField] private SettingsInit config;
 
     private SoundSettings soundSettings;
-    private bool SettingsWasChanged = false;
+    [SerializeField] private bool SettingsWasChanged = false;
+
+    [SerializeField] private AudioClip toggleClick;
+    private bool is_initializing = false;
+
 
     private void Awake()
-    {        
+    {
+        is_initializing = true;
         UIB = GameObject.FindGameObjectWithTag("MainCanvas").GetComponent<UIBehaviour>();
   
         Open();
+        is_initializing = false;
     }
 
     public void Open() 
@@ -38,10 +44,18 @@ public class ChangeSoundSettings : MonoBehaviour
         UpdateMixerVolume();
 
         UIB.RefreshAnimationCounter();
+
+        //print(SettingsWasChanged);
     }
 
     public void RestoreSettings() 
     {
+        if (config == null)
+        {
+            config = GameObject.FindWithTag("MainCanvas").GetComponent<SettingsInit>();
+            //print(config + "  WHY???");
+        }
+
         soundSettings = config.ReloadSoundSettings();
 
         master.value = soundSettings.GeneralSound;
@@ -49,7 +63,9 @@ public class ChangeSoundSettings : MonoBehaviour
         effects.value = soundSettings.EffectsSound;
         mute.isOn = soundSettings.MuteApp;
         mute_on_min.isOn = soundSettings.MuteOnMin;
+
         SettingsWasChanged = false;
+
     }
 
 
@@ -95,11 +111,22 @@ public class ChangeSoundSettings : MonoBehaviour
     }
     public void OnMuteToggleChange()
     {
+        if (!is_initializing)
+        {
+            SoundFXManager.instance.PlaySoundClipOnClick(toggleClick);
+        }
+
+        AudioListener.pause = mute.isOn;
         soundSettings.MuteApp = mute.isOn;
         SettingsWasChanged = true;
     }
     public void OnMuteonMinChange()
     {
+        if (!is_initializing)
+        {
+            SoundFXManager.instance.PlaySoundClipOnClick(toggleClick);
+        }
+        Application.runInBackground = !mute_on_min.isOn;
         soundSettings.MuteOnMin = mute_on_min.isOn;
         SettingsWasChanged = true;
     }
@@ -128,7 +155,8 @@ public class ChangeSoundSettings : MonoBehaviour
 
     public static float UnNormilizeSoundValue(float val) 
     {
-        return val * 85 - 80;
+        if (val < 0.0001) val = 0.0001f;
+        return Mathf.Log10(val) * 20f;
     }
 
 }

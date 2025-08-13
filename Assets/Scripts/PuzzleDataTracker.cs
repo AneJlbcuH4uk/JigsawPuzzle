@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
 
 public class PuzzleDataTracker : MonoBehaviour
 {
@@ -18,9 +17,12 @@ public class PuzzleDataTracker : MonoBehaviour
     [SerializeField] private bool isAutoSaving = false;
     [SerializeField] private int number_of_autosaves = 10;
     [SerializeField] private UIBehaviour UIB_ref;
+    
+
 
     private string save_path;
     private GeneralSettings _GeneralSettings;
+    private bool puzzle_completed = false;
 
     PuzzleGeneration pg;
     
@@ -72,9 +74,12 @@ public class PuzzleDataTracker : MonoBehaviour
 
     public void Save() 
     {
-        var t = pg.GetPLD();
-        string name = t.GetImageName().Length > 21 ? t.GetImageName()[0..20] : t.GetImageName();
-        GetLoadingData().SaveToFile($"QS_{name}_{DateTime.Now:yyyy_MM_dd_HH_mm}");
+        if (puzzle_completed) 
+        {
+            return;
+        }
+        string name = GenerateSaveFileName();
+        GetLoadingData().SaveToFile(name);
 
         string[] fileNames = Directory.GetFiles(save_path);
         List<string> quicksaves = new List<string>();
@@ -98,6 +103,20 @@ public class PuzzleDataTracker : MonoBehaviour
             }
         }
     }
+
+    private string GenerateSaveFileName() 
+    {
+        string name = GetImageName();
+        return $"QS_{name}_{DateTime.Now:yyyy_MM_dd_HH_mm}";
+    }
+
+    private string GetImageName() 
+    {
+        var t = pg.GetPLD();
+        string name = t.GetImageName().Length > 21 ? t.GetImageName()[0..20] : t.GetImageName();
+        return name;
+    }
+
 
 
 
@@ -128,6 +147,7 @@ public class PuzzleDataTracker : MonoBehaviour
     private IEnumerator GameEnd() 
     {
         interaction_disabled = true;
+        puzzle_completed = true;
         var sr = GetComponent<SpriteRenderer>();
         var pg = GetComponent<PuzzleGeneration>();
         var image = pg.GetImage();
@@ -151,9 +171,30 @@ public class PuzzleDataTracker : MonoBehaviour
         pg.DisablePuzzles();
         pg.EnableShader();
         interaction_disabled = false;
-        print("game end");
+        DeleteAutoSaves();
+
+        gameObject.GetComponent<InGameUi>().PuzzleComplete();
+
         yield return null;
     }
+
+    private void DeleteAutoSaves() 
+    {
+        string save_directory = GetLoadingData().GetSavePath();
+        string name = GetImageName();
+        foreach (var v in Directory.GetFiles(save_directory)) 
+        {
+            string readed_filename = Path.GetFileNameWithoutExtension(v);
+            string readed_filename_cropped = readed_filename[3..(readed_filename.Length - 17)];
+            if (name == readed_filename_cropped) 
+            {
+                GetLoadingData().DeleteFile(readed_filename);
+            }
+        }
+    }
+
+
+
 
     private IEnumerator MarkPuzzleAsComplete() 
     {

@@ -185,6 +185,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   index: 26
   neighbours_data: []
+  ConnectionSound: {fileID: 8300000, guid: f9ea6ef1b49d3a24e85bf7a08c16d008, type: 3}
+  HoverOverSound: {fileID: 8300000, guid: 118a8feb653b568498ec913dc4a3fe18, type: 3}
+  PickPuzzleSound: {fileID: 8300000, guid: bb27c9b7a5490934d9606a340b9a1fa1, type: 3}
+  ConnectionSound_volume: 1
+  HoverOverSound_volume: 0.4
+  PickPuzzleSound_volume: 1
 --- !u!61 &1736261403925021394
 BoxCollider2D:
   m_ObjectHideFlags: 0

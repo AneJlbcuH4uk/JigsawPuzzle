@@ -122,6 +122,10 @@ MonoBehaviour:
     m_Localized: "\xBFEst\xE1s seguro de que quieres salir?"
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Localized: Lista de colecciones
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

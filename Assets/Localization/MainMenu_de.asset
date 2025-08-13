@@ -125,6 +125,10 @@ MonoBehaviour:
     m_Localized: "Bist du sicher, dass du das Spiel verlassen m\xF6chtest?"
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Localized: Sammlungsliste
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

@@ -43,6 +43,10 @@ public class PuzzleLoadingData : MonoBehaviour
 
     void Awake()
     {
+        if(GameObject.FindGameObjectsWithTag("LoadingData").Length > 1) 
+        {
+            Destroy(gameObject);
+        }
         SetPath();
         DontDestroyOnLoad(gameObject);    
     }
@@ -146,6 +150,20 @@ public class PuzzleLoadingData : MonoBehaviour
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(Path.Combine(path_to_saves, save_file_name + ".json"), json);
     }
+
+    public void DeleteFile(string save_file_name) 
+    {
+        SetPath();
+        if (!Directory.Exists(path_to_saves))
+        {
+            return;
+        }
+
+        File.Delete(Path.Combine(path_to_saves, save_file_name + ".json"));
+    }
+
+
+
 
     private void SetPath() 
     {

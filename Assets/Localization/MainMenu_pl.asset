@@ -122,6 +122,10 @@ MonoBehaviour:
     m_Localized: "Czy na pewno chcesz wyj\u015B\u0107?"
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Localized: Lista kolekcji
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

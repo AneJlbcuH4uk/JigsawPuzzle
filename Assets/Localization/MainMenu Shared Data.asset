@@ -119,6 +119,10 @@ MonoBehaviour:
     m_Key: SETTINGS_LABEL
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Key: FILTER_COLLECTIONS_LIST
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

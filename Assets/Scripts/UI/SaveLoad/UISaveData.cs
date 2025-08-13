@@ -56,6 +56,7 @@ public class UISaveData : MonoBehaviour
             if (uwr.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError($"Failed to load texture: {uwr.error}");
+                Destroy(gameObject);
                 yield break;
             }
 

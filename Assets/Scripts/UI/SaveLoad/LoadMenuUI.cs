@@ -21,6 +21,7 @@ public class LoadMenuUI : MonoBehaviour
     [SerializeField] private GameObject DeleteButton;
     [SerializeField] private GameObject RenameButton;
     [SerializeField] private GameObject NoSaveFilesImage;
+    [SerializeField] private GameObject DeletePopUpWindow;
 
     [SerializeField] private TMP_InputField rename_field;
 
@@ -186,14 +187,19 @@ public class LoadMenuUI : MonoBehaviour
 
     public void OnButtonDelete() 
     {
-        for(int i = 0; i < selected_saves.Count; i++) 
+        DeletePopUpWindow.SetActive(true);
+    } 
+
+    public void DeleteSaves() 
+    {
+        for (int i = 0; i < selected_saves.Count; i++)
         {
             selected_saves[i].DeleteSave();
         }
         ResetState();
         ResetMenu();
-        
-    } 
+    }
+
 
     private void ResetMenu() 
     {
@@ -236,10 +242,13 @@ public class LoadMenuUI : MonoBehaviour
 
             var last_save_pos = new Vector3(0, -55, transform.position.z);
             var worldPosition = last_save_holder.transform.TransformPoint(last_save_pos);
+
             var last_save = Instantiate(savefile_ui_prefab, worldPosition, Quaternion.identity, last_save_holder.transform);
             var data = last_save.GetComponent<UISaveData>();
 
             StartCoroutine(data.SetUISaveData(save_files[lastsave_index]));
+
+
             save_files.RemoveAt(lastsave_index);
 
             if (save_files.Count == 0)
@@ -252,9 +261,9 @@ public class LoadMenuUI : MonoBehaviour
             
             foreach (var save in save_files)
             {
-                var delta = old_saves_holder.GetComponent<RectTransform>().sizeDelta;
-                
+                var delta = old_saves_holder.GetComponent<RectTransform>().sizeDelta;         
                 old_saves_holder.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 160) + delta;
+
                 var t = Instantiate(savefile_ui_prefab, old_saves_holder.transform.GetChild(0).GetChild(0));
                 t.GetComponent<RectTransform>().anchoredPosition = old_save_pos;
 
@@ -267,8 +276,9 @@ public class LoadMenuUI : MonoBehaviour
             updatemask(old_saves_holder.GetComponent<RectTransform>().sizeDelta.y - 520);
 
         }
-        else 
+        else
         {
+            print("a?");
             old_saves_holder.SetActive(false);
             last_save_holder.transform.GetChild(0).gameObject.SetActive(false);
             SelectButton.SetActive(false);

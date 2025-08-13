@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,17 +12,16 @@ public class InGameUi : MonoBehaviour
     [SerializeField] private GameObject LoadingScreen;
     [SerializeField] private Material mat ;
     [SerializeField] private TMP_InputField save_name_field;
+    [SerializeField] private GameObject puzzle_complete_screen;
 
-    private GameObject confirm_exit_window;
-    private GameObject cancel_exit_button;
+    [SerializeField] private GameObject confirm_exit_window;
+    [SerializeField] private GameObject settings_menu;
+    [SerializeField] private GameObject save_menu;
 
     private PuzzleLoadingData PLD;
 
     private void Start()
     {
-        cancel_exit_button = UIHolder.transform.GetChild(2).gameObject;
-        confirm_exit_window = UIHolder.transform.GetChild(3).gameObject;
-
         PLD = dataTracker.GetLoadingData();
         if (PLD.data_was_set)
         {
@@ -48,6 +46,7 @@ public class InGameUi : MonoBehaviour
         yield return new WaitForSeconds(1);
         LoadingScreen.SetActive(false);
         GameObject.FindGameObjectWithTag("MainCanvas").SetActive(false);
+        PuzzlePiece.change_playing_state(true);
     }
 
     private void Awake()
@@ -63,10 +62,12 @@ public class InGameUi : MonoBehaviour
 
     public void Pause()
     {
+        PuzzlePiece.change_playing_state(UIHolder.activeSelf);
         UIHolder.SetActive(!UIHolder.activeSelf);
         dataTracker.SetInteractionBool(UIHolder.activeSelf);
-        cancel_exit_button.SetActive(false);
         confirm_exit_window.SetActive(false);
+        settings_menu.SetActive(false);
+        save_menu.SetActive(false);
     }
 
     public bool IsUIActive() => UIHolder.activeSelf;
@@ -80,6 +81,11 @@ public class InGameUi : MonoBehaviour
     public void OnSaveFieldClick() 
     {
         save_name_field.text = "";
+    }
+
+    public void PuzzleComplete() 
+    {
+        puzzle_complete_screen.SetActive(true);
     }
 
     public void OnSaveButtonClick() 

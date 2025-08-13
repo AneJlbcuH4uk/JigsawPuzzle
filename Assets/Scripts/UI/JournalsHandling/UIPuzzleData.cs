@@ -37,7 +37,7 @@ public class UIPuzzleData : MonoBehaviour
     {
         PuzzleConfigMenu = transform.GetChild(2).gameObject;
         preview = transform.GetChild(0).GetComponent<Image>();
-        _gray_preview_pic = Sprite.Create(CreateGrayTexture(1920, 1080), new Rect(0, 0, 1920, 1080), new Vector2(.5f, .5f));
+        _gray_preview_pic = Sprite.Create(CreateGrayTexture(380, 250), new Rect(0, 0, 380, 250), new Vector2(.5f, .5f));
         completion_sign = transform.GetChild(3).gameObject;
         //UpdateImage();
     }
@@ -63,6 +63,7 @@ public class UIPuzzleData : MonoBehaviour
     {
         ResetMaskType(MaskType.Classic);
         SetNumberOfPuzzles(4);
+        SetCompletionMark(false);
         offset = 5;
     }
 
@@ -78,6 +79,7 @@ public class UIPuzzleData : MonoBehaviour
 
     public IEnumerator SetUIPuzzleData(PuzzleData data, bool completed)
     {
+        yield return null;
         ResetConfigToDefault();
         if (PuzzleConfigMenu.activeSelf)
         {
@@ -97,26 +99,58 @@ public class UIPuzzleData : MonoBehaviour
             }
             else
             {
-                Texture2D downloadedTexture = DownloadHandlerTexture.GetContent(request);
-                puzzle_image = new Texture2D(downloadedTexture.width, downloadedTexture.height, TextureFormat.RGBA32, false);
-                puzzle_image.SetPixels(downloadedTexture.GetPixels());
-                puzzle_image.Apply();
-
                 mask_type = data.Mt;
                 number_of_puzzles_in_height = data.Num;
                 offset = data.Off;
                 path_to_im = data.Image;
-
-                UpdateImage();
-
                 _this_puzzle_was_completed = completed;
                 SetCompletionMark(_this_puzzle_was_completed);
+
+                Texture2D downloadedTexture = DownloadHandlerTexture.GetContent(request);
+                
+                float targetAspect = 380f / 250f;
+                float imageAspect = (float)downloadedTexture.width / downloadedTexture.height;
+
+                Rect uvRect;
+                if (imageAspect > targetAspect)
+                {
+                    // too wide -> crop left/right
+                    float newWidth = targetAspect / imageAspect; // relative width
+                    uvRect = new Rect((1f - newWidth) / 2f, 0f, newWidth, 1f);
+                }
+                else
+                {
+                    // too tall -> crop top/bottom
+                    float newHeight = imageAspect / targetAspect; // relative height
+                    uvRect = new Rect(0f, (1f - newHeight) / 2f, 1f, newHeight);
+                }
+
+                RenderTexture rt = RenderTexture.GetTemporary(380, 250, 0, RenderTextureFormat.ARGB32);
+                RenderTexture.active = rt;
+
+                GL.PushMatrix();
+                GL.LoadPixelMatrix(0, 1, 1, 0); // Match UVs
+                Graphics.DrawTexture(new Rect(0, 0, 1, 1), downloadedTexture, uvRect, 0, 0, 0, 0);
+                GL.PopMatrix();
+
+                Texture2D scaledTexture = new Texture2D(380, 250, TextureFormat.RGBA32, false);
+                scaledTexture.ReadPixels(new Rect(0, 0, 380, 250), 0, 0);
+                scaledTexture.Apply();
+
+                RenderTexture.ReleaseTemporary(rt);
+                RenderTexture.active = null;
+
+                puzzle_image = scaledTexture;
+                UpdateImage();
+
             }
         }
     }
 
     private void SetCompletionMark(bool state) 
     {
+        if(completion_sign == null)
+        completion_sign = transform.GetChild(3).gameObject;
         completion_sign.SetActive(state);       
     }
 

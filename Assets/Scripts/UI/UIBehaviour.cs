@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -139,14 +138,11 @@ public class UIBehaviour : MonoBehaviour
             for (int i = 0; i < number_of_journals; i++)
             {
                 var j = Instantiate(Journal_pref, PanelJournalHolder.transform.Find("JournalHolder").transform);
-                //j.name += $"{i}";
-                Journals.Add(j);
-                
+                j.SetActive(false);
+                Journals.Add(j); 
             }
 
             int hidden_journals_count = 0;
-
-            
             float before = Time.realtimeSinceStartup;
 
             for (int i = 0; i - hidden_journals_count < number_of_journals; i++)
@@ -402,7 +398,7 @@ public class UIBehaviour : MonoBehaviour
 
     // __________________________________________________________________________________________
     // logic of JournalUI
-    private int cur_page = 0;
+    [SerializeField] private int cur_page = 0;
     public void OnClickJournalButton() 
     {
         print("journal open triggered");
@@ -474,42 +470,68 @@ public class UIBehaviour : MonoBehaviour
         }
     }
 
+    private List<IEnumerator> image_load_list = new List<IEnumerator>();
+
+    private void ClearImageLoadingCoroutines() 
+    {
+        foreach (var corou in image_load_list) 
+        {
+            StopCoroutine(corou);
+        }
+
+        image_load_list.Clear();
+    }
+
+
+    private bool waiting_before_next_flip = false;
+
+    private IEnumerator flip_delay(float delay) 
+    {
+        waiting_before_next_flip = true;
+        yield return new WaitForSecondsRealtime(delay);
+        waiting_before_next_flip = false;
+    }
+
 
     // called when flip next button is pressed
     public void FlipNext() 
     {
-        //add flip animation
-        DrawPage(1);
-        DrawPage(1);
+        if (!waiting_before_next_flip)
+        {
+            ClearImageLoadingCoroutines();
+            DrawPage(1);
+            DrawPage(1);
+        }
+        StartCoroutine(flip_delay(0.1f));    
     }
 
     // called when flip prev button is pressed
     public void FlipPrev()
     {
-        //add flip animation
-        if (cur_page % 2 == 0)
-            DrawPage(-2);
-        else 
-            DrawPage(-1);
-
-        if(cur_page > 0)
-            DrawPage(-1);
+        if (!waiting_before_next_flip)
+        {
+            ClearImageLoadingCoroutines();
+            DrawPage(-3);
+            DrawPage(1);
+        }
+        StartCoroutine(flip_delay(0.1f));
     }
 
     // draws page for JouranlUI checks if additional pages / buttons need to be active
     private void DrawPage(int incr)
     {
-        cur_page += incr;
         var jd = Opened_Journal.GetComponent<UIJournalData>();
-
+        
+        cur_page += incr;
+        
         CheckRightFlipButton(jd.GetNumberOfPages(), cur_page);
         CheckLeftFlipButton(jd.GetNumberOfPages(), cur_page);
-
         DrawImagesOnPage(cur_page, jd);
     }
 
     // draws images on a page for JouranlUI depends on int page(number).
     // For journal spread requires 2 calls 1 for left and 1 for right.
+
     private void DrawImagesOnPage(int page, UIJournalData jd) 
     {
         Transform pagepart = page % 2 == 0 ? RightPage.transform : LeftPage.transform;
@@ -519,16 +541,21 @@ public class UIBehaviour : MonoBehaviour
             var data = jd.GetPage(page);           
             for (int i = 0; i < JournalData.GetItemsPerPage(); i++)
             {
-                var photo = pagepart.GetChild(i + 1);              
+                var photo = pagepart.GetChild(i + 1);
+                Button load_puzzle = photo.GetComponent<Button>();
+                load_puzzle.enabled = false;
                 if (data[i] != null)
                 {
                     photo.gameObject.SetActive(true);
-                    StartCoroutine(photo.GetComponent<UIPuzzleData>().SetUIPuzzleData(data[i], jd.is_puzzle_completed(Path.GetFileName(data[i].Image))));
+                    IEnumerator coroutine = photo.GetComponent<UIPuzzleData>().SetUIPuzzleData(data[i], jd.is_puzzle_completed(Path.GetFileName(data[i].Image)));
+                    image_load_list.Add(coroutine);
+                    StartCoroutine(coroutine);
                 }
                 else
                 {
                     photo.gameObject.SetActive(false);
                 }
+                load_puzzle.enabled = true;
             }
         }
     }
@@ -551,11 +578,6 @@ public class UIBehaviour : MonoBehaviour
         JournalUI.SetActive(false);
     }
 
-    //PuzzleLoadingData new_pld;
-
-    
-
-
     // Starts selected puzzle with set parameters on click on choosen image
     public void OnClickStartPuzzleButton() 
     {
@@ -565,11 +587,11 @@ public class UIBehaviour : MonoBehaviour
         ManagerDataRef.SetData(data);
 
 
-        StartCoroutine(LoadSceneAsync(ManagerDataRef.scene_name));
+        StartCoroutine(LoadScene(ManagerDataRef.scene_name));
         
     }
 
-    IEnumerator LoadSceneAsync(string name) 
+    IEnumerator LoadScene(string name) 
     {
         yield return new WaitUntil(ManagerDataRef.IsImageLoaded);
         var im = LoadingScreen.transform.GetChild(1).GetComponent<Image>();
@@ -611,6 +633,9 @@ public class UIBehaviour : MonoBehaviour
     public int wait_till_confirm = 4;
     public bool unsaved_in_menu = false;
 
+    [SerializeField] private List<UIAddSoundOnClick> SoundSwapObjs;
+
+
     public void ContinueAnimation() 
     {
         //print(unsaved_in_menu);
@@ -639,7 +664,16 @@ public class UIBehaviour : MonoBehaviour
     public void CloseSettingsMenu() 
     {
         if (SettingsMenu.activeSelf)
-        {        
+        {
+            if (unsaved_in_menu) 
+            {
+                // swap sound
+                foreach(var obj in SoundSwapObjs) 
+                {
+                    obj.ChangeSoundClip();
+                }
+                
+            }
             StartCoroutine(ReturnMenuBack());
             //StartCoroutine(ChangeStateWithDelay(ButtonSettings,0.25f,true));
         }
@@ -662,6 +696,11 @@ public class UIBehaviour : MonoBehaviour
 
         StartCoroutine(RotateImage(40f, ButtonSettings.GetComponent<Image>(), 0.25f));
 
+        // swap sound back
+        foreach (var obj in SoundSwapObjs)
+        {
+            obj.RestoreClip();
+        }
         StopCoroutine(ReturnMenuBack());
     }
 
@@ -707,10 +746,13 @@ public class UIBehaviour : MonoBehaviour
 
     public void OnSaveLoadClick() 
     {
-        StartCoroutine(LoadSceneAsync(ManagerDataRef.scene_name));
+        StartCoroutine(LoadScene(ManagerDataRef.scene_name));
     }
 
-
+    public void CloseGame() 
+    {
+        Application.Quit();
+    }
     
     
 

@@ -20,14 +20,20 @@ public class ChangeGeneralSettings : MonoBehaviour
     [SerializeField] private Slider AutosaveFrequencySlider;
     [SerializeField] private Slider AutosaveNumberSlider;
     [SerializeField] private GameObject SystemClock;
+    
 
     [SerializeField] private Vector2 FrequencyRange = new Vector2(1, 60);
 
     private GeneralSettings generalSettings;
-    private bool SettingsWasChanged = false;
+    [SerializeField] private bool SettingsWasChanged = false;
+
+
+    [SerializeField] private AudioClip toggleClick;
+    private bool is_initializing = false;
 
     private void Awake()
     {
+        is_initializing = true;
         generalSettings = config.ReloadGeneralSettings();
         FontManager.GetInstance().ChangeFont(generalSettings.language);
 
@@ -41,6 +47,7 @@ public class ChangeGeneralSettings : MonoBehaviour
         }
         LanguageDrop.AddOptions(options);
         Open();
+        is_initializing = false;
     }
 
     public void Open() 
@@ -49,7 +56,11 @@ public class ChangeGeneralSettings : MonoBehaviour
 
         RestoreSettings();
         UIB.RefreshAnimationCounter();
+        
     }
+
+
+
 
     public void OnNumberOfSavesSliderChange() 
     {
@@ -100,12 +111,22 @@ public class ChangeGeneralSettings : MonoBehaviour
 
     public void OnToggleChangeSystemClock() 
     {
+        if (!is_initializing)
+        {
+            SoundFXManager.instance.PlaySoundClipOnClick(toggleClick);
+        }
+
         generalSettings.systemClock = SystemClockToggle.isOn;
         SettingsWasChanged = true;
     }
 
     public void OnToggleChangeAutosave()
     {
+        if (!is_initializing) 
+        {
+            SoundFXManager.instance.PlaySoundClipOnClick(toggleClick);
+        }
+
         generalSettings.autosavetoggle = AutosaveToggle.isOn;
         AutosaveFrequencySlider.gameObject.SetActive(generalSettings.autosavetoggle);
         AutosaveNumberSlider.gameObject.SetActive(generalSettings.autosavetoggle);
@@ -122,6 +143,7 @@ public class ChangeGeneralSettings : MonoBehaviour
     {
         if (SettingsWasChanged) 
         {
+            //print(SettingsWasChanged);
             Confirmation_screen.SetActive(true);
             ChangeNoSaveInMenu();
         }
@@ -142,8 +164,17 @@ public class ChangeGeneralSettings : MonoBehaviour
         //RestoreSettings();
     }
 
+    
+
     public void RestoreSettings() 
     {
+        if (config == null)
+        {
+            config = GameObject.FindWithTag("MainCanvas").GetComponent<SettingsInit>();
+            //print(config + "  WHY???");
+        }
+
+
         generalSettings = config.ReloadGeneralSettings();
         int locale_index = GetLocaleIndexByCode(generalSettings.language);
 
@@ -156,6 +187,7 @@ public class ChangeGeneralSettings : MonoBehaviour
         AutosaveFrequencySlider.value = generalSettings.autosaveFrequency;
 
         AutosaveNumberSlider.value = generalSettings.number_of_auto_saves;
+
         SettingsWasChanged = false;
     }
 

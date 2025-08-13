@@ -34,8 +34,16 @@ public class PuzzlePiece : MonoBehaviour
     [SerializeField] private AudioClip HoverOverSound;
     [SerializeField] private AudioClip PickPuzzleSound;
 
+    [SerializeField] private float ConnectionSound_volume;
+    [SerializeField] private float HoverOverSound_volume;
+    [SerializeField] private float PickPuzzleSound_volume;
 
+    private static bool is_playing = false;
 
+    public static void change_playing_state(bool state) 
+    {
+        is_playing = state;
+    }
 
     private PuzzleDataTracker dataTracker;
     //private SpriteRenderer Thickness_ref;
@@ -113,22 +121,35 @@ public class PuzzlePiece : MonoBehaviour
         }
     }
 
+
+    private static GameObject SoundInstance = null;
+
     // currently only adding fading on mouse enter of collider
     private void OnMouseEnter()
     {
         //if (dataTracker.IsInteractionDisabled())
         //    return;
-        SoundFXManager.instance.PlaySoundClipOnClick(HoverOverSound);
-
+        
 
         if (!MC_ref.Is_holding())
         {
-            // add sound effects
+            if (is_playing)
+            {
+                if (SoundInstance != null)
+                {
+                    Destroy(SoundInstance);
+                }
+                SoundInstance = SoundFXManager.instance.PlaySoundClipOnClick(HoverOverSound, HoverOverSound_volume);
+
+
+                ChangeOutLineState(true);
+            }
+
 
             //print("entered" + (SR_ref.color.a == 1));
             // fading on hover
-            
-            ChangeOutLineState(true);
+
+           
             //if (1 - SR_ref.color.a < hover_light.a)
             //{
             //    SR_ref.color -= hover_light;
@@ -170,7 +191,14 @@ public class PuzzlePiece : MonoBehaviour
 
         MC_ref.SetHoldedPuzzle(this);
         //----------------------- play sound ----------------------- 
-        SoundFXManager.instance.PlaySoundClipOnClick(PickPuzzleSound);
+        if (is_playing)
+        {
+            if (SoundInstance != null)
+            {
+                Destroy(SoundInstance);
+            }
+            SoundInstance = SoundFXManager.instance.PlaySoundClipOnClick(PickPuzzleSound, PickPuzzleSound_volume);
+        }
         //----------------------------------------------------------
 
         offset = Camera.main.ScreenToWorldPoint(Input.mousePosition) - gameObject.transform.position;
@@ -224,6 +252,7 @@ public class PuzzlePiece : MonoBehaviour
     public void ChangeCollisionState(bool state) 
     {
         collision.enabled = state;
+
     }
 
     private void OnMouseDrag()
@@ -294,10 +323,16 @@ public class PuzzlePiece : MonoBehaviour
         MovePuzzle(slide);
     }
 
-    private void ConnectPuzzle(PuzzlePiece p1) 
+    private void ConnectPuzzle(PuzzlePiece p1, bool enable_sound = true)
     {
         //----------------------- play sound ----------------------- 
-        SoundFXManager.instance.PlaySoundClipOnClick(ConnectionSound);
+        if (enable_sound && is_playing) { 
+            if (SoundInstance != null)
+            {
+                Destroy(SoundInstance);
+            }
+            SoundFXManager.instance.PlaySoundClipOnClick(ConnectionSound, ConnectionSound_volume);
+        }
         //----------------------------------------------------------
         //adding holded tiles to connections
         foreach (var obj in connections)
@@ -399,7 +434,7 @@ public class PuzzlePiece : MonoBehaviour
         {
             CheckCollisionWithNeighbours();
             if (closest_connection != null)
-                ConnectPuzzle(closest_connection.ReturnGameobjectByCollider().GetComponent<PuzzlePiece>());
+                ConnectPuzzle(closest_connection.ReturnGameobjectByCollider().GetComponent<PuzzlePiece>(),false);
             else
                 break;
         }

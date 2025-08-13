@@ -211,7 +211,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 5916100346057884464, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeInputSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
@@ -223,7 +223,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1747876966764483825, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeGraphicsSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
@@ -235,7 +235,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 3468697592242118178, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeGeneralSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
@@ -247,7 +247,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2245876342967458218, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeSoundSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
@@ -1149,19 +1149,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ChangeSoundSettings, Assembly-CSharp
-        m_MethodName: CancelChanges
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 5916100346057884464, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeInputSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
@@ -1173,7 +1161,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1747876966764483825, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeGraphicsSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
@@ -1185,8 +1173,20 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 3468697592242118178, guid: 435ec73f601572e428939bda908448cb, type: 3}
         m_TargetAssemblyTypeName: ChangeGeneralSettings, Assembly-CSharp
+        m_MethodName: CancelChanges
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2245876342967458218, guid: 435ec73f601572e428939bda908448cb, type: 3}
+        m_TargetAssemblyTypeName: ChangeSoundSettings, Assembly-CSharp
         m_MethodName: CancelChanges
         m_Mode: 1
         m_Arguments:

@@ -7,13 +7,15 @@ public class UIAddSoundOnClick : MonoBehaviour
 {
 
     [SerializeField] AudioClip clip;
+
+    private AudioClip clip_backup;
     private Button button;
     private Toggle toggle;
 
 
     void Awake()
     {
-        
+        clip_backup = clip;
         try 
         {
             button = gameObject.GetComponent<Button>();
@@ -33,6 +35,18 @@ public class UIAddSoundOnClick : MonoBehaviour
         {
 
         }
+    }
+
+    public void ChangeSoundClip() 
+    {
+        var new_clip = GetComponent<AdditionalAudioClip>().GetClip();
+        clip = new_clip;
+    }
+
+    public void RestoreClip()
+    {
+        if(clip != clip_backup)
+            clip = clip_backup;
     }
 
 }

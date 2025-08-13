@@ -123,6 +123,10 @@ MonoBehaviour:
     m_Localized: "\xCAtes-vous s\xFBr de vouloir quitter ?"
     m_Metadata:
       m_Items: []
+  - m_Id: 122014232040976384
+    m_Localized: Liste des collections
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

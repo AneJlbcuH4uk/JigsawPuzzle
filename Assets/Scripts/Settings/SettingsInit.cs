@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Localization;
@@ -45,7 +46,11 @@ public class SettingsInit : MonoBehaviour
         _generalSettings = ReloadGeneralSettings();
         //_inputSettings = ReloadInputSettings();
 
+        //print("init complete");
+
         SetLoaded();
+
+
     }
 
     private void SetLoaded() 
@@ -60,6 +65,8 @@ public class SettingsInit : MonoBehaviour
         mixer.SetFloat("MasterVolume",ChangeSoundSettings.UnNormilizeSoundValue(_soundSettings.GeneralSound));
         mixer.SetFloat("MusicVolume", ChangeSoundSettings.UnNormilizeSoundValue(_soundSettings.MusicSound));
         mixer.SetFloat("EffectsVolume", ChangeSoundSettings.UnNormilizeSoundValue(_soundSettings.EffectsSound));
+        AudioListener.pause = _soundSettings.MuteApp;
+        Application.runInBackground = !_soundSettings.MuteOnMin;
     }
 
     private IEnumerator WaitForLocalizationInitialization()

@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine.UI;
-using static UnityEditor.VersionControl.Asset;
-using System;
 
 public class UIJournalFilter : MonoBehaviour
 {

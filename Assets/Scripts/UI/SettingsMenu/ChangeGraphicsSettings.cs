@@ -21,7 +21,7 @@ public class ChangeGraphicsSettings : MonoBehaviour
 
     [SerializeField] private SettingsInit config;
 
-    private bool SettingsWasChanged = false;
+    [SerializeField] private bool SettingsWasChanged = false;
 
     private static List<FullScreenMode> mode = new List<FullScreenMode>()
     {
@@ -121,6 +121,13 @@ public class ChangeGraphicsSettings : MonoBehaviour
 
     public void RestoreSettings() 
     {
+        
+        if (config == null) 
+        {
+            config = GameObject.FindWithTag("MainCanvas").GetComponent<SettingsInit>();
+            //print(config + "  WHY???");
+        }
+
         GraphicSettings = config.ReloadGraphicsSettings();
 
         fullscreenmode_drop.value = GraphicSettings.FullscreenMode;
@@ -136,6 +143,7 @@ public class ChangeGraphicsSettings : MonoBehaviour
 
         aspectratio_drop.value = index;
         ChangeResolutionDroptable(index, res_ind);
+
         SettingsWasChanged = false;
     }
 
@@ -188,6 +196,8 @@ public class ChangeGraphicsSettings : MonoBehaviour
             //Screen.SetResolution(res.x, res.y, fullscreenmode_drop.value != 2);
         }
         SettingsWasChanged = true;
+
+        
     }
 
     public void OnButtonSave() 
