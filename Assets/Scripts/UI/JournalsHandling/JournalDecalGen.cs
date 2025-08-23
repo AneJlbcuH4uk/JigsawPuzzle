@@ -79,7 +79,7 @@ public class JournalDecalGen : MonoBehaviour
 
         
 
-        //print(path_to_images);
+        //print(gameObject.GetComponent<Image>().IsActive());
         StartCoroutine(LoadImages(max_image_size));
         yield return new WaitUntil(() => images_loaded);
         CreateDecal();
@@ -230,6 +230,7 @@ public class JournalDecalGen : MonoBehaviour
         }
 
         images_loaded = true;
+        print("images for decal loaded");
     }
 
 

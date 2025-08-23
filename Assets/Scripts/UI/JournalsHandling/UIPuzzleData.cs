@@ -25,6 +25,8 @@ public class UIPuzzleData : MonoBehaviour
     [SerializeField] private bool _this_puzzle_was_completed = false;
     [SerializeField] private GameObject PuzzleConfigMenu;
 
+    private float puzzle_image_width;
+    private float puzzle_image_height;
 
     public Texture2D GetImage() => puzzle_image;
     public MaskType GetMaskType() => mask_type;
@@ -107,7 +109,12 @@ public class UIPuzzleData : MonoBehaviour
                 SetCompletionMark(_this_puzzle_was_completed);
 
                 Texture2D downloadedTexture = DownloadHandlerTexture.GetContent(request);
-                
+
+                puzzle_image_width = downloadedTexture.width;
+                puzzle_image_height = downloadedTexture.height;
+
+                //loaded_image_size = downloadedTexture.
+
                 float targetAspect = 380f / 250f;
                 float imageAspect = (float)downloadedTexture.width / downloadedTexture.height;
 
@@ -189,7 +196,9 @@ public class UIPuzzleData : MonoBehaviour
     {
         int[] res = new int[2];
 
-        res[1] = Mathf.FloorToInt((float)puzzle_image.height / max_puzzle_height);
+        res[1] = Mathf.FloorToInt(puzzle_image_height / max_puzzle_height);
+        //print((float)puzzle_image.height);
+
         res[0] = GetAmountOfPuzzlesInWidth(res[1]);
 
         return res;
@@ -201,20 +210,20 @@ public class UIPuzzleData : MonoBehaviour
 
         if (mask_type == MaskType.Classic)
         {
-            res = Mathf.FloorToInt(puzzle_image.width / (puzzle_image.height / val));
+            res = Mathf.FloorToInt(puzzle_image_width / (puzzle_image_height / val));
         }
         if (mask_type == MaskType.Hex)
         {
-            var radius = ((float)puzzle_image.height / val) / Mathf.Sqrt(3);
-            res = Mathf.FloorToInt((puzzle_image.width - radius / 2) / (1.5f * radius));
+            var radius = (puzzle_image_height / val) / Mathf.Sqrt(3);
+            res = Mathf.FloorToInt((puzzle_image_width - radius / 2) / (1.5f * radius));
         }
         if (mask_type == MaskType.Tshape)
         {
-            res = Mathf.RoundToInt(puzzle_image.width / (puzzle_image.height / val));
+            res = Mathf.RoundToInt(puzzle_image_width / (puzzle_image_height / val));
         }
         if(mask_type == MaskType.Scale) 
         {
-            res = Mathf.FloorToInt(puzzle_image.width / (puzzle_image.height / val));
+            res = Mathf.FloorToInt(puzzle_image_width / (puzzle_image_height / val));
         }
 
 
@@ -235,27 +244,27 @@ public class UIPuzzleData : MonoBehaviour
         }
         if(mask_type == MaskType.Hex) 
         {
-            float radius = ((float)puzzle_image.height / val) / Mathf.Sqrt(3);
-            float num_in_y = Mathf.Floor((puzzle_image.width - radius / 2) / (1.5f * radius));
+            float radius = (puzzle_image_height / val) / Mathf.Sqrt(3);
+            float num_in_y = Mathf.Floor((puzzle_image_width - radius / 2) / (1.5f * radius));
             res = (int)(num_in_y * val - (int)num_in_y / 2);
         }
         if (mask_type == MaskType.Scale)
         {
-            float radius = puzzle_image.height / val / 2;
-            int num_in_y =  Mathf.FloorToInt(puzzle_image.width / radius / 2);
+            float radius = puzzle_image_height / val / 2;
+            int num_in_y =  Mathf.FloorToInt(puzzle_image_width / radius / 2);
             print(num_in_y);
             res = 2 * val * num_in_y + val;
         }
         if (mask_type == MaskType.SnowFlake)
         {
-            float radius = puzzle_image.height / val / 2;
-            float num_in_y = Mathf.Floor((puzzle_image.width - 2 * radius) / (radius * 2 * Mathf.Sqrt(3))) + 1;
+            float radius = puzzle_image_height / val / 2;
+            float num_in_y = Mathf.Floor((puzzle_image_width - 2 * radius) / (radius * 2 * Mathf.Sqrt(3))) + 1;
 
             res =(int)(val * num_in_y + (val + 1) * (num_in_y + 1)) * 3 - 2 - val * 2;
         }
         if (mask_type == MaskType.Sshape)
         {
-            float num_in_y = Mathf.Round(puzzle_image.width / (puzzle_image.height / (float)val));
+            float num_in_y = Mathf.Round(puzzle_image_width / (puzzle_image_height / (float)val));
             res = Mathf.RoundToInt((val * num_in_y * (1f + (13f / 18f)) + (val + num_in_y * (1f + (1f/3f))))*1.2f);
         }
 

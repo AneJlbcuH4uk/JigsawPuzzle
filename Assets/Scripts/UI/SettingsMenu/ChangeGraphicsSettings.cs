@@ -61,8 +61,10 @@ public class ChangeGraphicsSettings : MonoBehaviour
         new Vector2Int(1152,648),
         new Vector2Int(1280,720),
         new Vector2Int(1366,768),
+        new Vector2Int(1536,864),
         new Vector2Int(1600,900),
         new Vector2Int(1920,1080),
+        new Vector2Int(2048,1152),
         new Vector2Int(2560,1440),
         new Vector2Int(3840,2160)
     };
@@ -73,7 +75,10 @@ public class ChangeGraphicsSettings : MonoBehaviour
         new Vector2Int(3440,1440)
     };
 
-    private static List<Vector2Int> List_of_res_others = new List<Vector2Int>();
+    private static List<Vector2Int> List_of_res_others = new List<Vector2Int>() 
+    {
+        new Vector2Int(7680,2160)
+    };
 
     private static List<List<Vector2Int>> ratio_to_res = new List<List<Vector2Int>>();
 

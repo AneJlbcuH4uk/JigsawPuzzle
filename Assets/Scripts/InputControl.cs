@@ -71,6 +71,8 @@ public class InputControl : MonoBehaviour
             InMenuControl();
     }
 
+    private Vector3 start_pos = Vector3.zero;
+
     private void InGameControl() 
     {
         if (GameManager.Is_Loading())
@@ -105,6 +107,18 @@ public class InputControl : MonoBehaviour
         if (Input.GetButtonDown("Cancel"))
         {
             EscapeMenuUI.Pause();
+        }
+
+        if (Input.GetButtonDown("ResetCamera")) 
+        {
+            if(start_pos == Vector3.zero) 
+            {
+                start_pos = gameObject.transform.position;
+            }
+
+            gameObject.transform.position = Vector3.zero;
+
+
         }
 
 

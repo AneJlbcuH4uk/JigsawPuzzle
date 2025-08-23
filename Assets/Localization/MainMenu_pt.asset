@@ -126,6 +126,14 @@ MonoBehaviour:
     m_Localized: "Lista de cole\xE7\xF5es"
     m_Metadata:
       m_Items: []
+  - m_Id: 122442715128934400
+    m_Localized: Quer sair?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 122477456867733504
+    m_Localized: "Quebra-cabe\xE7a conclu\xEDdo"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

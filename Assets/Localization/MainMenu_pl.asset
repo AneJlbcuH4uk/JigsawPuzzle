@@ -126,6 +126,14 @@ MonoBehaviour:
     m_Localized: Lista kolekcji
     m_Metadata:
       m_Items: []
+  - m_Id: 122442715128934400
+    m_Localized: "Chcesz wyj\u015B\u0107?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 122477456867733504
+    m_Localized: "Puzzle uko\u0144czone"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

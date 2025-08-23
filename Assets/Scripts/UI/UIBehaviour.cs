@@ -61,6 +61,9 @@ public class UIBehaviour : MonoBehaviour
     // float duration => duration in seconds how long to move object towards point
     // bool deactivate => set true if gona setactive(false) at the end of movement
 
+    
+
+
 
     private IEnumerator MoveImage(Vector2 direction, Image UIelement, float duration, bool deactivate = false)
     {
@@ -105,13 +108,29 @@ public class UIBehaviour : MonoBehaviour
     private IEnumerator Start()
     {
         ManagerDataRef = GameObject.FindGameObjectWithTag("LoadingData").GetComponent<PuzzleLoadingData>();
-        LoadingScreen.transform.GetChild(1).GetComponent<Image>().material.SetFloat("_CurFillPercent", 0.5f);
+        LoadingScreen.transform.GetChild(1).GetComponent<Image>().material.SetFloat("_CurFillPercent", 0.0f);
+
+
 
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
             puzzle_sets = Filter.GetPuzzleSets();
             //puzzle_sets = Directory.GetDirectories(path_to_set_folders).ToList<string>();
             number_of_journals = puzzle_sets.Count;
+
+            int number_of_loading_steps = (number_of_journals + 1) * 2;
+            var MenuLoadingScreen = GetComponent<MainMenuLoadingScreen>();
+
+            float load_state = 0f;
+
+            void MoveProgressBarUI()
+            {
+                load_state += 1f / number_of_loading_steps;
+                MenuLoadingScreen.SetState(load_state >= 1 ? 1 : load_state);
+            }
+
+
+
 
             for (int i = 0; i < 4; i++)
             {
@@ -132,14 +151,17 @@ public class UIBehaviour : MonoBehaviour
             }
 
             _delta_for_1_sec_anim = Time.fixedUnscaledDeltaTime;
-            
+
+            MoveProgressBarUI();
+
             Journals = new List<GameObject>();
 
             for (int i = 0; i < number_of_journals; i++)
             {
                 var j = Instantiate(Journal_pref, PanelJournalHolder.transform.Find("JournalHolder").transform);
-                j.SetActive(false);
-                Journals.Add(j); 
+                //j.SetActive(false);   cannot disable cuz decal generation breaks. It cannot start coroutine from disabled gameobject.
+                Journals.Add(j);
+                MoveProgressBarUI();
             }
 
             int hidden_journals_count = 0;
@@ -169,7 +191,7 @@ public class UIBehaviour : MonoBehaviour
                 UpdateJournal(Journals[i - hidden_journals_count], state, false);
                 if (!state) hidden_journals_count++;
 
-                
+                MoveProgressBarUI();
             }
 
             print($"journal generation time = {Time.realtimeSinceStartup - before}");
@@ -184,7 +206,8 @@ public class UIBehaviour : MonoBehaviour
 
             // add loading screen that prevents from interacting with the game before everything loaded
             print("everything loaded");
-
+            load_state = 1;
+            MoveProgressBarUI();
             yield return null;
         }
 

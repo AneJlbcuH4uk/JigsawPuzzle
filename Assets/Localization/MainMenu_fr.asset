@@ -127,6 +127,14 @@ MonoBehaviour:
     m_Localized: Liste des collections
     m_Metadata:
       m_Items: []
+  - m_Id: 122442715128934400
+    m_Localized: Voulez-vous quitter ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 122477456867733504
+    m_Localized: "Puzzle termin\xE9"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

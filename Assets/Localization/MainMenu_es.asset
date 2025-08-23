@@ -126,6 +126,14 @@ MonoBehaviour:
     m_Localized: Lista de colecciones
     m_Metadata:
       m_Items: []
+  - m_Id: 122442715128934400
+    m_Localized: "\xBFQuieres salir?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 122477456867733504
+    m_Localized: Rompecabezas completado
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
