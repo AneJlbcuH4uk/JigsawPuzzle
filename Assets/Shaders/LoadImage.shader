@@ -7,8 +7,9 @@ Shader "Unlit/LoadImage"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
         LOD 100
+        Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
         {
@@ -72,7 +73,7 @@ Shader "Unlit/LoadImage"
 			    // Interpolate between dark and gray based on the smooth transition
 			    col = lerp(fixed4(0.1, 0.1, 0.1, 1), grayCol, blend);
 
-			    // Apply fog if necessary
+			    // Apply fog
 			    UNITY_APPLY_FOG(i.fogCoord, col);
 
 			    return col;

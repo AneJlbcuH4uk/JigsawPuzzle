@@ -117,8 +117,8 @@ public class SettingsInit : MonoBehaviour
 
         if (!Directory.Exists(directoryPath))
         {
-            Debug.LogError($"Config directory does not exist: {directoryPath}");
-            return;
+            Debug.Log($"Config directory does not exist: {directoryPath} creating a new one");
+            Directory.CreateDirectory(directoryPath);
         }
 
         // Check if the settings file exists.
@@ -216,7 +216,7 @@ public class SettingsInit : MonoBehaviour
     }
 
 
-    private string GetPath(Settings type)  => Path.Combine(Application.streamingAssetsPath, "Config/", settings_type[(int) type]);
+    private string GetPath(Settings type)  => Path.Combine(Application.persistentDataPath, "Config/", settings_type[(int) type]);
 
 
 

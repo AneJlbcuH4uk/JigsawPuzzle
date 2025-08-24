@@ -10,7 +10,7 @@ public class UIJournalFilter : MonoBehaviour
 {
 
     private string path_to_set_folders = Application.streamingAssetsPath + "/Puzzles"; // probably better use Recources 
-    private string path_to_filter_config = Application.streamingAssetsPath + "/Config/filter_config.json";
+    private string path_to_filter_config;
 
     List<string> journals;
 
@@ -51,6 +51,7 @@ public class UIJournalFilter : MonoBehaviour
 
     private void Awake()
     {
+        path_to_filter_config = Path.Combine(Application.persistentDataPath,"Config/filter_config.json");
         journals = Directory.GetDirectories(path_to_set_folders).ToList();
         //print(journals[0]);
 

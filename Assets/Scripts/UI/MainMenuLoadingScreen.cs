@@ -21,7 +21,7 @@ public class MainMenuLoadingScreen : MonoBehaviour
     {
         progress_bar_width = -Mathf.RoundToInt(state * (-1720) + 1820);
         Vector2 offsetMax = ProgressBarTransform.offsetMax;
-        offsetMax.x = progress_bar_width;  // Note: negative values move inward from the right
+        offsetMax.x = progress_bar_width;
         ProgressBarTransform.offsetMax = offsetMax;
         if (state == 1)
         {

@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1664
     height: 951
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Project
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -449,9 +449,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 4a600100
+      m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 9238ffff4242ffff0e4cffff4266ffff2275fffffa82ffff1293ffff8ec4ffff46c5ffffa8ccffffced9ffff28e7ffff1afbffffeca20000baa5000012a6000030a7000044a80000feae0000c6b100007e610100
+      m_ExpandedIDs: be12feff142dfeff0865feff2265feff926ffeff5277feff66a0feff2ab8feff18bffeffb0f3feff8208fffffa22ffff7832ffff44e7ffff4aefffffbeefffffccefffff1afbffffbe780000547a0000427b0000047d0000247d0000a24701003c4f01001e520100e0ed0200
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -857,9 +857,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 356.65707, y: 216.09164, z: 0.41399205}
+    m_Target: {x: 377.41498, y: 176.50732, z: 1.5745234}
     speed: 2
-    m_Value: {x: 356.65707, y: 216.09164, z: 0.41399205}
+    m_Value: {x: 377.41498, y: 176.50732, z: 1.5745234}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -909,9 +909,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 426.73398
+    m_Target: 310.68112
     speed: 2
-    m_Value: 426.73398
+    m_Value: 310.68112
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -981,7 +981,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scenes
+    - Assets/Images
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -989,16 +989,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scenes
+  - Assets/Images
   m_LastFoldersGridSize: -1
   m_LastProjectPath: F:\UnityGames\JigsawPuzzle
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 111}
-    m_SelectedIDs: 82b20000
-    m_LastClickedID: 45698
-    m_ExpandedIDs: 000000001e880000208800002288000084b200008cb20000f8b2000000ca9a3b
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 42880000
+    m_LastClickedID: 34882
+    m_ExpandedIDs: 000000001e880000208800002288000024880000268800002888000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1026,7 +1026,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000001e8800002088000022880000
+    m_ExpandedIDs: 000000001e8800002088000022880000248800002688000028880000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1053,8 +1053,8 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: c6230000b072000000000000a8740000e4730000147200009282000062700000707000008e9d00005070000028770000bc790000c279000060b4000032a80000ca7b0000b69b000046780000eaee0100820c0200
+    m_HadKeyboardFocusLastEvent: 0
+    m_ExpandedInstanceIDs: c6230000b0720000a8740000e4730000147200009282000062700000707000008e9d00005070000028770000bc790000c279000060b4000032a80000ca7b0000b69b000046780000eaee0100820c020000000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

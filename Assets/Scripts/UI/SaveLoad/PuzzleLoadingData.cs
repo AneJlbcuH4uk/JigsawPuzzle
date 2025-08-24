@@ -76,6 +76,13 @@ public class PuzzleLoadingData : MonoBehaviour
         return Path.GetDirectoryName(path_to_image);
     }
 
+    public string GetComplFilePath()
+    {
+        return Path.Combine(Application.persistentDataPath, "PuzzleCompl", Path.GetFileName(Path.GetDirectoryName(path_to_image).TrimEnd(Path.DirectorySeparatorChar)));
+    }
+
+
+
     private void SetPuzzleTransforms() 
     {
         var pg = GameObject.FindGameObjectWithTag("GameManager").GetComponent<PuzzleGeneration>();

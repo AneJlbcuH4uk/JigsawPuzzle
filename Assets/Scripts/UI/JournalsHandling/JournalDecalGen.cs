@@ -13,7 +13,7 @@ public class JournalDecalGen : MonoBehaviour
     //[SerializeField] int number_of_images_in_decal = 5;
 
     string path_to_images = Application.streamingAssetsPath + "/Puzzles/TestPuzzle1";
-    string path_to_decals = Application.streamingAssetsPath + "/Decals";
+    string path_to_decals; 
 
     [SerializeField] private List<Texture2D> decal_images = new List<Texture2D>();
     [SerializeField] private Texture2D image_placeholder;
@@ -35,7 +35,16 @@ public class JournalDecalGen : MonoBehaviour
         centers_location_rect = vec;
     }
 
-    
+    private void Awake()
+    {
+        path_to_decals = Path.Combine(Application.persistentDataPath, "Decals");
+        if (!Directory.Exists(path_to_decals))
+        {
+            Directory.CreateDirectory(path_to_decals);
+        }
+        //yield return new WaitForEndOfFrame();
+    }
+
     public IEnumerator LoadDecal() 
     {
         var info = new DirectoryInfo(Path.GetDirectoryName(path_to_images));
@@ -50,10 +59,10 @@ public class JournalDecalGen : MonoBehaviour
             Debug.LogError($"Failed to get path");
         }
 
-        //print(path_to_decals + "/" + Path.GetFileName(path_to_images));
         using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture("file://" + path_to_decals + "/" + Path.GetFileName(path_to_images)))
         {
             yield return uwr.SendWebRequest();
+
             if (uwr.result == UnityWebRequest.Result.Success)
             {
                 Texture2D tempTexture = DownloadHandlerTexture.GetContent(uwr);
@@ -61,11 +70,11 @@ public class JournalDecalGen : MonoBehaviour
                 SetDecalFromTexture();
                 yield break;
             }
-            else 
+            else
             {
-                Debug.Log("Failed to load texture generating a new one");
+                Debug.Log($"Failed to load texture {Path.GetFileName(path_to_images)} generating a new one");
             }
-            
+
         }
 
 
@@ -153,6 +162,7 @@ public class JournalDecalGen : MonoBehaviour
         decal.Apply();
         byte[] itemBGBytes = decal.EncodeToPNG();
         //print(Path.GetFileNameWithoutExtension(path_to_images));
+        
         File.WriteAllBytes( path_to_decals + $"/{Path.GetFileNameWithoutExtension(path_to_images)}", itemBGBytes);
         SetDecalFromTexture();
         //print(im.textureRect);

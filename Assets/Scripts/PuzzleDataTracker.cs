@@ -213,7 +213,8 @@ public class PuzzleDataTracker : MonoBehaviour
     {
 
         Dictionary<string, bool> PuzzleCompletion = new Dictionary<string, bool>();
-        string path = pg.GetPLD().GetJournalName();
+        string path = pg.GetPLD().GetComplFilePath();
+        print(path);
         string jsonFile = File.ReadAllText(Path.Combine(path, $"{Path.GetFileName(path)}_completion.json"));
 
         DictionaryWrapper wrapper = JsonUtility.FromJson<DictionaryWrapper>(jsonFile);

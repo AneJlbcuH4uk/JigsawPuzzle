@@ -42,7 +42,7 @@ public class JournalData
     private static int items_per_page = 3;
     private int number_of_pages;
     public int number_of_images_in_journal = 0;
-
+    private string path_to_compl_file = "";
 
     public Dictionary<string,bool> PuzzleCompletion = new Dictionary<string, bool>();
 
@@ -65,7 +65,8 @@ public class JournalData
 
     private void InitializeCompletion()
     {
-        string puzzle_compl_json = Path.Combine(path, $"{Path.GetFileName(path)}_completion.json");
+        path_to_compl_file = Path.Combine(Application.persistentDataPath, "PuzzleCompl", Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar)));
+        string puzzle_compl_json = Path.Combine(path_to_compl_file, $"{Path.GetFileName(path)}_completion.json");
 
         if (File.Exists(puzzle_compl_json))
         {
@@ -128,6 +129,13 @@ public class JournalData
         }
         else 
         {
+            Debug.Log(path_to_compl_file);
+            if (!Directory.Exists(path_to_compl_file)) 
+            {
+                Directory.CreateDirectory(path_to_compl_file);
+                
+            }
+
             var info = new DirectoryInfo(path);
             var fileInfo = info.GetFiles();
             foreach(var file in fileInfo) 
