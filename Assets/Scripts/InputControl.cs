@@ -9,6 +9,8 @@ public class InputControl : MonoBehaviour
     [SerializeField] private float scale = 0.2f; // speed of getting camera up via scrolling
     [SerializeField] private InGameUi EscapeMenuUI;
     [SerializeField] private Vector2 zoom_limits = new Vector2 (3,20);
+    [SerializeField] private Vector2 camera_border = new Vector2 (100, 50);
+    
 
     private new Camera camera;  // instance of main scene camera
     
@@ -63,6 +65,7 @@ public class InputControl : MonoBehaviour
         }
     }
 
+    public Vector2 GetBorderlimit() => camera_border;
     void Update()
     {
         if(Scene_name == GameSceneName)
@@ -72,6 +75,22 @@ public class InputControl : MonoBehaviour
     }
 
     private Vector3 start_pos = Vector3.zero;
+    private Vector2 moving_camera_pos; 
+
+    float MediumOfthree(float a, float b, float c) 
+    {
+        return Mathf.Min(Mathf.Max(a, b), c);
+    }
+
+    public Vector3 limit_camera_pos3(Vector2 pos, float z)
+    {
+        Vector3 temp = Vector2.zero;
+        temp.x += MediumOfthree(-camera_border.x, pos.x, camera_border.x);
+        temp.y += MediumOfthree(-camera_border.y, pos.y, camera_border.y);
+        temp.z = z;
+        return temp;
+    }
+
 
     private void InGameControl() 
     {
@@ -101,7 +120,9 @@ public class InputControl : MonoBehaviour
         if (Input.GetButton("MoveCamera") && !EscapeMenuUI.IsUIActive())
         {
             change = -camera.ScreenToWorldPoint(Input.mousePosition) + (Vector3)offset + gameObject.transform.position;
-            gameObject.transform.position = new Vector3(change.x, change.y, -10);
+            //change = limit_camera_pos(change);
+
+            gameObject.transform.position = limit_camera_pos3(change,-10);
         }
 
         if (Input.GetButtonDown("Cancel"))
@@ -125,7 +146,9 @@ public class InputControl : MonoBehaviour
         // moving camera if cursor close to window edge
         if (IsCursorAtTheBorder() && !EscapeMenuUI.IsUIActive())
         {
-            gameObject.transform.position += (Vector3)((Vector2)Input.mousePosition - lastScreenSize / 2).normalized * speed * Time.deltaTime;
+            moving_camera_pos = ((Vector2)Input.mousePosition - lastScreenSize / 2).normalized * speed * Time.deltaTime + (Vector2)gameObject.transform.position;
+            Vector3 moving_camera_pos3 = limit_camera_pos3(moving_camera_pos,-10);
+            gameObject.transform.position = moving_camera_pos3;
         }
     }
     

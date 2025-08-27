@@ -17,6 +17,8 @@ public class MouseControl : MonoBehaviour
     private Vector2 offset_for_sel;
     private GameObject SelectionBoxMask;
     private BoxCollider2D MaskCollider;
+
+    
     [SerializeField] private List<GameObject> allpuzzles = new List<GameObject>();
     public static MouseControl GetInstance() 
     {
@@ -65,10 +67,7 @@ public class MouseControl : MonoBehaviour
     private void OnEmptyUp() 
     {      
         Bounds boxBounds = FlattenBounds(MaskCollider.bounds);
-        //print(boxBounds.size.sqrMagnitude);
         if (boxBounds.size.sqrMagnitude == 4) return;
-
-        //print($"number of collisions {colliders.Length} center {center} shapes {halfExtents}");
 
         bool was_added = false;
         foreach(var p in allpuzzles) 
@@ -81,7 +80,6 @@ public class MouseControl : MonoBehaviour
                 was_added = true;
 
                 col.gameObject.GetComponent<PuzzlePiece>().ChangeOutLineState(true);
-               // print("was added");
             }
         }
         if (!was_added)
@@ -98,8 +96,6 @@ public class MouseControl : MonoBehaviour
         ClearMask();
     }
 
-    //public bool Is_BoxSelected() => selected_puzzles.Count > 0;
-
     public ref List<GameObject> Selected_p() => ref selected_puzzles;
 
     private void Awake()
@@ -113,8 +109,7 @@ public class MouseControl : MonoBehaviour
             Destroy(this);
         }
         force_field = gameObject.GetComponent<Collider2D>();
-        
-        
+
         SelectionBoxMask = GameObject.FindGameObjectWithTag("SelectionBox");
         MaskCollider = SelectionBoxMask.GetComponent<BoxCollider2D>();
     }
@@ -124,13 +119,6 @@ public class MouseControl : MonoBehaviour
         allpuzzles = data;
     }
 
-    //private void Update()
-    //{
-    //    if (holded_puzzle != null)
-    //    {
-    //        holded_puzzle.CheckCollisionWithNeighbours();
-    //    }
-    //}
 
     private void Update()
     {
@@ -147,30 +135,7 @@ public class MouseControl : MonoBehaviour
             OnEmptyUp();
         }
 
-
-
-        //if (Input.GetButtonDown("Fire1") && _is_draging_selection()) 
-        //{
-        //    print($"holding {selected_puzzles.Count} puzzles");
-        //}
-        //if (Input.GetButton("Fire1") && _is_draging_selection())
-        //{
-        //    print($"holding {selected_puzzles.Count} puzzles");
-        //}
-
-
-        //if (Input.GetButton("Fire2")) 
-        //{
-        //    var mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //    force_field.offset = mouseWorldPos;
-        //    force_field.enabled = true;
-
-        //}
-        //else
-        //    force_field.enabled = false;
     }
-
-    //private bool _is_draging_selection() => Is_holding() && selected_puzzles.Count > 1;
 
 
     public void SetHoldedPuzzle(PuzzlePiece p) 
@@ -188,7 +153,6 @@ public class MouseControl : MonoBehaviour
 
     public void UnsetHoldedPuzzle() 
     {
-        //print("unset");
         if (holded_puzzle != null)
             holded_puzzle.MoveToBottom();
         holded_puzzle = null;

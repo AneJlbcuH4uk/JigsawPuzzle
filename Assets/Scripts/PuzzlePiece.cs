@@ -260,7 +260,7 @@ public class PuzzlePiece : MonoBehaviour
         if (dataTracker.IsInteractionDisabled())
             return;
         // getting position of mouse and change of the moved object
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 mousePos = InputControl.instance.limit_camera_pos3(Camera.main.ScreenToWorldPoint(Input.mousePosition),0);
         Vector3 change = (Vector2)mousePos - (Vector2)gameObject.transform.position - offset;
 
         // magnetting puzzle logic

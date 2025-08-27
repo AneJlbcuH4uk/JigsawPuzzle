@@ -134,6 +134,10 @@ MonoBehaviour:
     m_Localized: "Puzzle uko\u0144czone"
     m_Metadata:
       m_Items: []
+  - m_Id: 127507613198331904
+    m_Localized: "Usun\u0105\u0107 wybrane?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

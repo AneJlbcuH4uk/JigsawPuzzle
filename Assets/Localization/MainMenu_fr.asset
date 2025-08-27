@@ -135,6 +135,10 @@ MonoBehaviour:
     m_Localized: "Puzzle termin\xE9"
     m_Metadata:
       m_Items: []
+  - m_Id: 127507613198331904
+    m_Localized: "Supprimer la s\xE9lection ?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

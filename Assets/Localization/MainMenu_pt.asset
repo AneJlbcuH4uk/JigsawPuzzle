@@ -134,6 +134,10 @@ MonoBehaviour:
     m_Localized: "Quebra-cabe\xE7a conclu\xEDdo"
     m_Metadata:
       m_Items: []
+  - m_Id: 127507613198331904
+    m_Localized: Excluir selecionados?
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

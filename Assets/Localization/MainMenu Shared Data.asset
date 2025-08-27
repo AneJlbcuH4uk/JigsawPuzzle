@@ -131,6 +131,10 @@ MonoBehaviour:
     m_Key: PUZZLE_COMPLETE
     m_Metadata:
       m_Items: []
+  - m_Id: 127507613198331904
+    m_Key: LOAD_MENU_DELETE_SELECTED
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

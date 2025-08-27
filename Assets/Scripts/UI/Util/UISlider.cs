@@ -61,7 +61,6 @@ public class UISlider : MonoBehaviour
     {
         slider.minValue = 2;
         slider.maxValue = data_ref.GetMaxAmountOfPuzzles()[1];
-        print(data_ref.GetMaxAmountOfPuzzles()[1]);
     }
 
 }

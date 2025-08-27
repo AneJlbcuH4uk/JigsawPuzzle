@@ -134,6 +134,10 @@ MonoBehaviour:
     m_Localized: Rompecabezas completado
     m_Metadata:
       m_Items: []
+  - m_Id: 127507613198331904
+    m_Localized: "\xBFEliminar seleccionados?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

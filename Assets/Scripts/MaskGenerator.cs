@@ -865,7 +865,7 @@ public class MaskGenerator
         }
         if (t == MaskType.Sshape)
         {
-            DrawSshapeGrid(c, number_of_puzzles,0.1f);
+            DrawSshapeGrid(c, number_of_puzzles,0.05f);
         }
         if(t == MaskType.SnowFlake) 
         {

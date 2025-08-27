@@ -1392,6 +1392,7 @@ MonoBehaviour:
   scale: 0.4
   EscapeMenuUI: {fileID: 953581227}
   zoom_limits: {x: 3, y: 20}
+  camera_border: {x: 100, y: 50}
   Scene_name: 
   Close_SaveMenu: {fileID: 0}
   Close_SettingsMenu: {fileID: 0}
@@ -2105,6 +2106,7 @@ GameObject:
   m_Component:
   - component: {fileID: 851302930}
   - component: {fileID: 851302929}
+  - component: {fileID: 851302931}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -2173,12 +2175,26 @@ Transform:
   m_GameObject: {fileID: 851302928}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.404687, y: -1.5679517, z: 20}
+  m_LocalPosition: {x: 0, y: 0, z: 20}
   m_LocalScale: {x: 0.35, y: 0.35, z: 0.35}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &851302931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 851302928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5bcd0cc98bbbba468fb8c8cd1dd11fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  border_width: 25
+  border_color: {r: 0.22745098, g: 0.13333334, b: 0.023529412, a: 1}
 --- !u!1 &858299054
 GameObject:
   m_ObjectHideFlags: 0
