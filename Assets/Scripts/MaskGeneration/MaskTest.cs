@@ -15,7 +15,7 @@ public class MaskTest : MonoBehaviour
 
     void Start()
     {
-        var mg = new MaskGenerator(resolution, maxJumpDistance, maskType);
+        var mg = MaskGenerator.Create(resolution, maxJumpDistance, maskType);
         var maskTexture = mg.GetMask();
         var img = gameObject.GetComponent<Image>();
 

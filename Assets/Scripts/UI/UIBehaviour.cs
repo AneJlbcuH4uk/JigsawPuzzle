@@ -424,7 +424,6 @@ public class UIBehaviour : MonoBehaviour
     [SerializeField] private int cur_page = 0;
     public void OnClickJournalButton() 
     {
-        print("journal open triggered");
         ButtonClose.SetActive(true);
         Opened_Journal = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         var jd = Opened_Journal.GetComponent<UIJournalData>();

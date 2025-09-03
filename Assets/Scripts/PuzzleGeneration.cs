@@ -98,7 +98,7 @@ public class PuzzleGeneration : MonoBehaviour
             UnityEngine.Random.InitState(seed);
         }
 
-        var mg = new MaskGenerator(new Vector2Int(image.width, image.height), number_of_puzzles_in_height, mask_type);
+        var mg = MaskGenerator.Create(new Vector2Int(image.width, image.height), number_of_puzzles_in_height, mask_type);
 
         mask = mg.GetMask();
         mask.filterMode = FilterMode.Point;
