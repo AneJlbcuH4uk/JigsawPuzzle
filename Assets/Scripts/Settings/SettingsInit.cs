@@ -13,8 +13,7 @@ public enum Settings
 {
     General,
     Graphics,
-    Sound,
-    Input
+    Sound
 }
 
 public class SettingsInit : MonoBehaviour
@@ -22,14 +21,12 @@ public class SettingsInit : MonoBehaviour
     public static string path_to_graphics_settings;
     public static string path_to_sound_settings;
     public static string path_to_general_settings;
-    public static string path_to_input_settings;
 
     private GraphicSettings _graphicSettings;
     private SoundSettings _soundSettings;
-    //private InputSettings _inputSettings;
     private GeneralSettings _generalSettings;
 
-    private readonly string[] settings_type = new string[] { "GeneralSettings.json","GraphicsSettings.json", "SoundSettings.json", "InputSettings.json",  };
+    private readonly string[] settings_type = new string[] { "GeneralSettings.json","GraphicsSettings.json", "SoundSettings.json" };
 
     [SerializeField] private AudioMixer mixer;
 
@@ -38,15 +35,12 @@ public class SettingsInit : MonoBehaviour
         path_to_graphics_settings = GetPath(Settings.Graphics);
         path_to_sound_settings = GetPath(Settings.Sound);
         path_to_general_settings = GetPath(Settings.General);
-        path_to_input_settings = GetPath(Settings.Input);
 
         // Call the method to set or load settings.
         _graphicSettings = ReloadGraphicsSettings();
         _soundSettings = ReloadSoundSettings();
         _generalSettings = ReloadGeneralSettings();
-        //_inputSettings = ReloadInputSettings();
 
-        //print("init complete");
 
         SetLoaded();
 
@@ -57,8 +51,7 @@ public class SettingsInit : MonoBehaviour
     {
         //graphics
         Screen.fullScreenMode = (FullScreenMode)_graphicSettings.FullscreenMode;
-        Screen.SetResolution(_graphicSettings.ScreenResolutionWidth, _graphicSettings.ScreenResolutionHeight, Screen.fullScreenMode);
-        //print(_graphicSettings.ScreenResolutionWidth + " + " + _graphicSettings.ScreenResolutionHeight);
+        Screen.SetResolution(_graphicSettings.ScreenResolutionWidth, _graphicSettings.ScreenResolutionHeight, Screen.fullScreenMode); 
         //general
         StartCoroutine(WaitForLocalizationInitialization());
         //sound
@@ -99,7 +92,6 @@ public class SettingsInit : MonoBehaviour
             {
                 // Set the selected locale
                 LocalizationSettings.SelectedLocale = locale;
-                //Debug.Log("Locale set to: " + locale.LocaleName);
                 return;
             }
         }
@@ -145,7 +137,6 @@ public class SettingsInit : MonoBehaviour
             {
                 // Write the settings to the file.
                 File.WriteAllText(path, jsonSettings);
-                //Debug.Log($"{typeof(T).Name} settings file created and written successfully.");
             }
             catch (IOException e)
             {
@@ -161,7 +152,6 @@ public class SettingsInit : MonoBehaviour
     {
         string set = File.ReadAllText(path);
         settingsInstance = JsonUtility.FromJson<T>(set);
-        //Debug.Log($"{typeof(T).Name} loaded successfully.");
     }
 
     public GraphicSettings ReloadGraphicsSettings() 
@@ -189,14 +179,6 @@ public class SettingsInit : MonoBehaviour
         return _generalSettings;
     }
 
-    //public InputSettings ReloadInputSettings() 
-    //{
-    //    LoadSettings(ref _inputSettings, path_to_input_settings, (inputSettings) =>
-    //    {
-    //        inputSettings.CreateNew();
-    //    });
-    //    return _inputSettings;
-    //}
 
 
     public void SaveSettings<T>(T settingsInstance, Settings type) where T : class
@@ -207,7 +189,6 @@ public class SettingsInit : MonoBehaviour
         {
             // Write the settings to the file.
             File.WriteAllText(GetPath(type), jsonSettings);
-            //Debug.Log($"{typeof(T).Name} settings file created and written successfully.");
         }
         catch (IOException e)
         {

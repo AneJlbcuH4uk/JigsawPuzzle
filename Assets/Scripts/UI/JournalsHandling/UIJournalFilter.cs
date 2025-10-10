@@ -20,40 +20,10 @@ public class UIJournalFilter : MonoBehaviour
     private Transform holder_content;
     private Dictionary<string, bool> journalStates = new Dictionary<string, bool>();
 
-    //private void Awake()
-    //{
-    //    journals = Directory.GetDirectories(path_to_set_folders).ToList<string>();
-    //    holder_content = collections_holder.transform.GetChild(0).GetChild(0);
-
-    //    var startpos = new Vector3(0, journals.Count * 30 - 30, 0);
-    //    int index = 0;
-    //    foreach (var j in journals)
-    //    {
-    //        var delta = collections_holder.GetComponent<RectTransform>().sizeDelta;
-
-    //        collections_holder.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 60) + delta;
-
-    //        var t = Instantiate(UIprefab, holder_content);
-    //        t.GetComponent<RectTransform>().anchoredPosition = startpos;
-    //        var text = t.transform.GetChild(1).GetComponent<TMP_Text>();
-    //        text.text = Path.GetFileNameWithoutExtension(j);
-
-    //        SetJournalState(index, true);
-    //        index++;
-    //        startpos.y -= 60;
-    //    }
-    //}
-
-
-
-
-
-
     private void Awake()
     {
         path_to_filter_config = Path.Combine(Application.persistentDataPath,"Config/filter_config.json");
         journals = Directory.GetDirectories(path_to_set_folders).ToList();
-        //print(journals[0]);
 
         holder_content = collections_holder.transform.GetChild(0).GetChild(0);
 
@@ -86,11 +56,8 @@ public class UIJournalFilter : MonoBehaviour
             }
             index++;
             startpos.y -= 60;
-
-            
+     
         }
-        //StartCoroutine(ApplyLoadedFilter());
-
     }
 
     public IEnumerator ApplyLoadedFilter() 
@@ -226,16 +193,6 @@ public class UIJournalFilter : MonoBehaviour
 
     public List<string> GetPuzzleSets() 
     {
-        //List<string> active_journals = new List<string>();
-
-        //for (int i = 0; i < holder_content.childCount; i++)
-        //{
-        //    //if (GetJournalState(i)) 
-        //    //{
-        //    print(journals[i]);
-        //    //}
-        //}
-
         return journals;
     }
 

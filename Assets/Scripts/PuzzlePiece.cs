@@ -10,7 +10,7 @@ public class PuzzlePiece : MonoBehaviour
 {
     [SerializeField] private static float magnet_distance = 0.2f;           // distance of puzzle magnet
 
-    private static MouseControl MC_ref;        // reference to MouseControl sript instance
+    private static MouseControl MC_ref;                                     // reference to MouseControl sript instance
     private static Color hover_light = new Color(0.0f, 0.0f, 0.0f, 0.4f);   // fade collor
 
     [SerializeField] private int index;                 // index of puzzle used in puzzle comparisons
@@ -21,7 +21,7 @@ public class PuzzlePiece : MonoBehaviour
     private SpriteRenderer SR_ref;                      // sprite renderer of puzzle keeps cropped image in form of puzzle
 
     //variables used in detection of neighbours 
-    private bool Is_looking_for_neighbours = false;    // if holding puzzle with neighbours in list
+    private bool Is_looking_for_neighbours = false;     // if holding puzzle with neighbours in list
     private bool Is_magneting = false;                  // if current holded puzzle is magneted
     private ConnectionPoint closest_connection = null;  // closest puzzle if there is collision was detected
 
@@ -46,7 +46,6 @@ public class PuzzlePiece : MonoBehaviour
     }
 
     private PuzzleDataTracker dataTracker;
-    //private SpriteRenderer Thickness_ref;
 
     private void Awake()
     {
@@ -54,8 +53,7 @@ public class PuzzlePiece : MonoBehaviour
         neighbours_data = new List<ConnectionPoint>();
         SR_ref = gameObject.GetComponent<SpriteRenderer>();
         connections = new List<GameObject>() { gameObject };
-        dataTracker = GameObject.FindGameObjectsWithTag("GameManager")[0].GetComponent<PuzzleDataTracker>();
-        //Thickness_ref = transform.GetChild(0).GetComponent<SpriteRenderer>();       
+        dataTracker = GameObject.FindGameObjectsWithTag("GameManager")[0].GetComponent<PuzzleDataTracker>();   
     }
 
     private void Start()
@@ -76,7 +74,6 @@ public class PuzzlePiece : MonoBehaviour
     public void Set_collider(Collider2D col)
     {
         collision = col;
-        //MC_ref.AddCollider(col);
     }
     public void SetNeighboursDataByRef(ref List<ConnectionPoint> r)
     {
@@ -124,12 +121,9 @@ public class PuzzlePiece : MonoBehaviour
 
     private static GameObject SoundInstance = null;
 
-    // currently only adding fading on mouse enter of collider
+    // adding fading and sound on mouse enter
     private void OnMouseEnter()
     {
-        //if (dataTracker.IsInteractionDisabled())
-        //    return;
-        
 
         if (!MC_ref.Is_holding())
         {
@@ -145,40 +139,18 @@ public class PuzzlePiece : MonoBehaviour
                 ChangeOutLineState(true);
             }
 
-
-            //print("entered" + (SR_ref.color.a == 1));
-            // fading on hover
-
-           
-            //if (1 - SR_ref.color.a < hover_light.a)
-            //{
-            //    SR_ref.color -= hover_light;
-            //    //transform.GetChild(0).gameObject.SetActive(true);
-            //    //Thickness_ref.color -= hover_light;
-            //}
-
         }
     }
 
-    // currently only remove fading on mouse exit of collider
+    //remove fading on mouse exit
     private void OnMouseExit()
     {
-        //if (dataTracker.IsInteractionDisabled())
-        //    return; 
-
-        
         if (!MC_ref.Is_holding())
         {
             // fading on hover
 
             if (!MC_ref.ContainsElement(gameObject))
                 ChangeOutLineState(false);
-            //if (SR_ref.color.a < 1) 
-            //{ 
-            //    SR_ref.color += hover_light;
-            //    //transform.GetChild(0).gameObject.SetActive(false);
-            //    //Thickness_ref.color += hover_light;
-            //}
 
         }
     }
@@ -224,7 +196,6 @@ public class PuzzlePiece : MonoBehaviour
     //connect magneted puzzle to <connections> or if not magneted remove puzzle from holded
     private void OnMouseUp()
     {
-        //print("up");
         ChangeCollisionState(true);
 
         foreach (var puz in MC_ref.Selected_p())
@@ -391,15 +362,7 @@ public class PuzzlePiece : MonoBehaviour
         if (Is_looking_for_neighbours)
         {
             CheckCollisionWithNeighbours();
-        }
-
-        
-
-        //if (dataTracker.IsInteractionDisabled() && SR_ref.color.a < 1) 
-        //{
-        //    SR_ref.color += hover_light;
-        //}
-                
+        }   
     }
 
     // method adding neighbour to list, not adding if neighbour with same index already exists

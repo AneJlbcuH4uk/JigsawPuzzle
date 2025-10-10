@@ -17,7 +17,6 @@ public class ScaleMask : MaskGenerator
         float radius = c.height / numberofp.y / 2;
         numberofp.x = Mathf.FloorToInt(c.width / radius / 2);
         float offset = (c.width - numberofp.x * radius * 2) / 2;
-        //print(numberofp);
         for (int i = 0; i < numberofp.y; i++)
         {
             for (int j = 0; j < numberofp.x; j++)
@@ -43,8 +42,6 @@ public class ScaleMask : MaskGenerator
         for (int i = 0; i <= numberofp.x; i++)
         {
             Vector2 center = new Vector2(i * 2 * radius + offset, c.height - 1);
-            //Vector2 lim = new Vector2(0, Mathf.PI * 2);
-            //DrawCircle(c, center, 20, Color.red, lim);
             FillArea(c, (int)center.x, (int)center.y, Color.black);
         }
 

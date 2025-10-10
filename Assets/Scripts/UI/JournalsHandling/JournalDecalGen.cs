@@ -42,7 +42,6 @@ public class JournalDecalGen : MonoBehaviour
         {
             Directory.CreateDirectory(path_to_decals);
         }
-        //yield return new WaitForEndOfFrame();
     }
 
     public IEnumerator LoadDecal() 
@@ -77,23 +76,13 @@ public class JournalDecalGen : MonoBehaviour
 
         }
 
-
-
-
-
-
         Normalize_coefs();
         centers = GenerateCenters();
         Vector2 max_image_size = (image_rect - centers_location_rect) / Mathf.Sqrt(2);
 
-        
-
-        //print(gameObject.GetComponent<Image>().IsActive());
         StartCoroutine(LoadImages(max_image_size));
         yield return new WaitUntil(() => images_loaded);
-        CreateDecal();
-        //yield return null;
-        
+        CreateDecal();    
     } 
 
 
@@ -152,20 +141,13 @@ public class JournalDecalGen : MonoBehaviour
                 }
             }
 
-
-            //print("corner  = " + corner + " | rect = " + decal_images[i].width + " | " + decal_images[i].height + " | " + center);
-            //decal.SetPixels((int)corner.x, (int)corner.y, decal_images[i].width, decal_images[i].height, decal_images[i].GetPixels());
-
-            
         }
 
         decal.Apply();
         byte[] itemBGBytes = decal.EncodeToPNG();
-        //print(Path.GetFileNameWithoutExtension(path_to_images));
-        
+
         File.WriteAllBytes( path_to_decals + $"/{Path.GetFileNameWithoutExtension(path_to_images)}", itemBGBytes);
         SetDecalFromTexture();
-        //print(im.textureRect);
     }
 
     private void SetDecalFromTexture() 
@@ -223,9 +205,7 @@ public class JournalDecalGen : MonoBehaviour
                     }
                     tempTexture.Apply();
 
-                    //print(tempTexture.height + " | " + tempTexture.width);
                     decal_images.Add(ResizeTexture(tempTexture, (int)new_rect.y, (int)new_rect.x));
-                    //print(new_rect);
                     
                 }
             }

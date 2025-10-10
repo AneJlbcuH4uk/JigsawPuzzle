@@ -44,8 +44,6 @@ public class ChangeSoundSettings : MonoBehaviour
         UpdateMixerVolume();
 
         UIB.RefreshAnimationCounter();
-
-        //print(SettingsWasChanged);
     }
 
     public void RestoreSettings() 
@@ -53,7 +51,6 @@ public class ChangeSoundSettings : MonoBehaviour
         if (config == null)
         {
             config = GameObject.FindWithTag("MainCanvas").GetComponent<SettingsInit>();
-            //print(config + "  WHY???");
         }
 
         soundSettings = config.ReloadSoundSettings();
@@ -136,7 +133,6 @@ public class ChangeSoundSettings : MonoBehaviour
         print("Sound" + SettingsWasChanged);
         if (!SettingsWasChanged) return;
         // change sound
-
 
         config.SaveSettings(soundSettings, Settings.Sound);
         SettingsWasChanged = false;

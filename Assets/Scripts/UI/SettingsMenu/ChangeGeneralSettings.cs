@@ -43,7 +43,6 @@ public class ChangeGeneralSettings : MonoBehaviour
         foreach (var loc in LocalizationSettings.AvailableLocales.Locales) 
         {
             options.Add(loc.Identifier.ToString());
-            //print(loc.Identifier.Code);
         }
         LanguageDrop.AddOptions(options);
         Open();
@@ -52,8 +51,6 @@ public class ChangeGeneralSettings : MonoBehaviour
 
     public void Open() 
     {
-        //generalSettings = config.ReloadGeneralSettings();
-
         RestoreSettings();
         UIB.RefreshAnimationCounter();
         
@@ -143,7 +140,6 @@ public class ChangeGeneralSettings : MonoBehaviour
     {
         if (SettingsWasChanged) 
         {
-            //print(SettingsWasChanged);
             Confirmation_screen.SetActive(true);
             ChangeNoSaveInMenu();
         }
@@ -171,7 +167,6 @@ public class ChangeGeneralSettings : MonoBehaviour
         if (config == null)
         {
             config = GameObject.FindWithTag("MainCanvas").GetComponent<SettingsInit>();
-            //print(config + "  WHY???");
         }
 
 

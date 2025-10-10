@@ -197,7 +197,6 @@ public class UIPuzzleData : MonoBehaviour
         int[] res = new int[2];
 
         res[1] = Mathf.FloorToInt(puzzle_image_height / max_puzzle_height);
-        //print((float)puzzle_image.height);
 
         res[0] = GetAmountOfPuzzlesInWidth(res[1]);
 

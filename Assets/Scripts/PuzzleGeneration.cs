@@ -360,11 +360,7 @@ public class PuzzleGeneration : MonoBehaviour
         sr.sprite = Sprite.Create(temp, new Rect(0, 0, temp.width, temp.height), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect);
         GenerateOutline(obj, temp);
 
-        //obj.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = sr.sprite;
-
         StartCoroutine(UpdateShapeToSprite(obj));
-
-        //yield return null;
     }
     private void GenerateOutline(GameObject puzzle, Texture2D img)
     {

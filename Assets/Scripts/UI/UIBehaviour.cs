@@ -50,7 +50,7 @@ public class UIBehaviour : MonoBehaviour
 
     private WaitForFixedUpdate _waitForFixedUpdate = new WaitForFixedUpdate();
     private int _cur_journal_page = 0;
-    private string path_to_set_folders = Application.streamingAssetsPath + "/Puzzles"; // probably better use Recources 
+    private string path_to_set_folders = Application.streamingAssetsPath + "/Puzzles";
     private Vector2[] deff_positions = new Vector2[8];
 
     private Vector2 old_pos_of_settings_button;
@@ -60,10 +60,6 @@ public class UIBehaviour : MonoBehaviour
     // Image UIelement => UIElement which is moved
     // float duration => duration in seconds how long to move object towards point
     // bool deactivate => set true if gona setactive(false) at the end of movement
-
-    
-
-
 
     private IEnumerator MoveImage(Vector2 direction, Image UIelement, float duration, bool deactivate = false)
     {
@@ -115,7 +111,6 @@ public class UIBehaviour : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "MainMenu")
         {
             puzzle_sets = Filter.GetPuzzleSets();
-            //puzzle_sets = Directory.GetDirectories(path_to_set_folders).ToList<string>();
             number_of_journals = puzzle_sets.Count;
 
             int number_of_loading_steps = (number_of_journals + 1) * 2;
@@ -243,11 +238,9 @@ public class UIBehaviour : MonoBehaviour
 
     public void UpdateJournal(GameObject j, bool state, bool forceUpdate = true) 
     {
-        //print("UpdateJournal is called");
 
         if (state)
         {
-            //j.transform.parent = PanelJournalHolder.transform.Find("JournalHolder").transform;
             j.transform.SetParent(PanelJournalHolder.transform.Find("JournalHolder").transform, false);
 
             if (!Journals.Contains(j))
@@ -269,8 +262,7 @@ public class UIBehaviour : MonoBehaviour
             }
 
             j.transform.SetParent(HiddenJournalsHolder.transform, false);
-            //j.transform.parent = HiddenJournalsHolder.transform;
-            
+           
             if (Journals.Contains(j))
             {
                 Journals.Remove(j);
@@ -289,8 +281,6 @@ public class UIBehaviour : MonoBehaviour
     {
         int startIndex = _cur_journal_page * 8;
         int endIndex = Mathf.Min(startIndex + 8,Journals.Count);
-
-        //print(startIndex+ " | " + endIndex +" | "+ Journals.Count);
 
         return Journals.FindIndex(startIndex,endIndex - startIndex, obj => obj == j) != -1;
     }
@@ -367,7 +357,6 @@ public class UIBehaviour : MonoBehaviour
             }
 
             StartCoroutine(MoveImage(-Journals[i].GetComponent<RectTransform>().anchoredPosition, Journals[i].GetComponent<Image>(), 0.25f,true));
-            //StartCoroutine(RotateImage(Journals[i].GetComponent<UIJournalData>().GetAngle(), Journals[i].GetComponent<Image>(), 0.5f));
             Journals[i].GetComponent<UIJournalData>().ClearData();
         }
     }
@@ -400,7 +389,6 @@ public class UIBehaviour : MonoBehaviour
             }
             Journals[i].SetActive(true);
             StartCoroutine(MoveImage(deff_positions[i%8], Journals[i].GetComponent<Image>(), anim_delay * 2));
-            //StartCoroutine(RotateImage(-Journals[i].GetComponent<UIJournalData>().GetAngle(), Journals[i].GetComponent<Image>(), 0.5f));
             Journals[i].GetComponent<UIJournalData>().ClearData();
         }
     }
@@ -590,9 +578,7 @@ public class UIBehaviour : MonoBehaviour
         StartCoroutine(MoveImage(jd.GetPos() - Opened_Journal.GetComponent<RectTransform>().anchoredPosition, Opened_Journal.GetComponent<Image>(), 0.2f));
         StartCoroutine(RotateImage(jd.GetAngle(), Opened_Journal.GetComponent<Image>(), 0.25f));
 
-        //jd.ClearData();
         Opened_Journal = null;
-        //Opened_Journal.transform.position += Vector3.back;
 
         cur_page = 0;
 
@@ -604,7 +590,6 @@ public class UIBehaviour : MonoBehaviour
     public void OnClickStartPuzzleButton() 
     {
         
-        //PuzzleLoadingData new_pld = new PuzzleLoadingData();
         var data = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.GetComponent<UIPuzzleData>();
         ManagerDataRef.SetData(data);
 
@@ -627,7 +612,6 @@ public class UIBehaviour : MonoBehaviour
         while (!op.isDone) 
         {
             float progress = Mathf.Clamp01(op.progress / 0.9f) / 10;
-            //print(progress);
             im.material.SetFloat("_CurFillPercent", progress);
             yield return null;
         }
@@ -642,7 +626,6 @@ public class UIBehaviour : MonoBehaviour
     {
         if (!SettingsMenu.activeSelf)
         {
-            //ButtonSettings.SetActive(false);
             StartCoroutine(MoveImage(center_coord_for_settings_button - ButtonSettings.GetComponent<RectTransform>().anchoredPosition,
                                      ButtonSettings.GetComponent<Image>(), 0.25f, true));
             StartCoroutine(RotateImage(-40f, ButtonSettings.GetComponent<Image>(), 0.25f));
@@ -652,7 +635,7 @@ public class UIBehaviour : MonoBehaviour
     }
 
 
-    public int wait_till_confirm = 4;
+    public int wait_till_confirm = 3;
     public bool unsaved_in_menu = false;
 
     [SerializeField] private List<UIAddSoundOnClick> SoundSwapObjs;
@@ -679,8 +662,7 @@ public class UIBehaviour : MonoBehaviour
 
     public void RefreshAnimationCounter() 
     {
-        wait_till_confirm = 4;
-        //print(wait_till_confirm);
+        wait_till_confirm = 3;
     }
 
     public void CloseSettingsMenu() 
@@ -697,13 +679,11 @@ public class UIBehaviour : MonoBehaviour
                 
             }
             StartCoroutine(ReturnMenuBack());
-            //StartCoroutine(ChangeStateWithDelay(ButtonSettings,0.25f,true));
         }
     }
 
     private IEnumerator ReturnMenuBack() 
     {
-        //print(wait_till_confirm);
         while (wait_till_confirm != 0)
         {
             yield return null;
@@ -761,7 +741,6 @@ public class UIBehaviour : MonoBehaviour
                                      GameLoadButton.GetComponent<Image>(), 0.25f, false));
 
             StartCoroutine(RotateImage(-40f, GameLoadButton.GetComponent<Image>(), 0.25f));
-            //StartCoroutine(ChangeStateWithDelay(ButtonSettings,0.25f,true));
             GameLoadButton.SetActive(true);
         }
     }

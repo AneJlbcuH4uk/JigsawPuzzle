@@ -234,20 +234,6 @@ public class InputControl : MonoBehaviour
         state = (CurrentMenuState)s;
     }
 
-
-    //drawing border for camera in scene view
-    //private void OnDrawGizmos()
-    //{
-    //    if (instance != null)
-    //    {
-    //        Gizmos.color = Color.red;
-    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(camera_border_width, 0, 0)), camera.ScreenToWorldPoint(new Vector3(camera_border_width, lastScreenSize.y, 0)));
-    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x - camera_border_width, 0, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x - camera_border_width, lastScreenSize.y, 0)));
-    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(0, camera_border_width, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x, camera_border_width, 0)));
-    //        Gizmos.DrawLine(camera.ScreenToWorldPoint(new Vector3(0, lastScreenSize.y - camera_border_width, 0)), camera.ScreenToWorldPoint(new Vector3(lastScreenSize.x, lastScreenSize.y - camera_border_width, 0)));
-    //    }
-    //}
-
     private void FixedUpdate()
     {
         // tracking and updating screen size for proper working of camera movement while geting close to border in case of screen resize

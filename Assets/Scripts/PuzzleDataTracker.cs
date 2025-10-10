@@ -45,8 +45,6 @@ public class PuzzleDataTracker : MonoBehaviour
         var _Main_canvas = GameObject.FindGameObjectWithTag("MainCanvas");
         _GeneralSettings = _Main_canvas.GetComponent<SettingsInit>().ReloadGeneralSettings();        
 
-        //print(_GeneralSettings);
-
         isAutoSaving = _GeneralSettings.autosavetoggle;
         auto_save_delay = _GeneralSettings.autosaveFrequency * 30;
         number_of_autosaves = _GeneralSettings.number_of_auto_saves;

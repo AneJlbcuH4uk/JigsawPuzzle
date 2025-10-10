@@ -86,9 +86,7 @@ public class ChangeGraphicsSettings : MonoBehaviour
 
     private GraphicSettings GraphicSettings;
 
-    //private Vector2Int set_to_resol = Vector2Int.zero;
     private string set_to_ratio = "";
-    //private FullScreenMode set_to_mode = FullScreenMode.ExclusiveFullScreen;
 
 
     private void Awake()
@@ -130,7 +128,6 @@ public class ChangeGraphicsSettings : MonoBehaviour
         if (config == null) 
         {
             config = GameObject.FindWithTag("MainCanvas").GetComponent<SettingsInit>();
-            //print(config + "  WHY???");
         }
 
         GraphicSettings = config.ReloadGraphicsSettings();
@@ -156,9 +153,7 @@ public class ChangeGraphicsSettings : MonoBehaviour
     public void OnWindowModeChanged() 
     {
         GraphicSettings.FullscreenMode = Mathf.Clamp((int)mode[fullscreenmode_drop.value] - 1,0,2);
-        //set_to_mode = mode[fullscreenmode_drop.value];
         fullscreenmode_drop.Hide();
-        //print(set_to_mode);
         SettingsWasChanged = true;
     }
 
@@ -166,7 +161,6 @@ public class ChangeGraphicsSettings : MonoBehaviour
     {
         ChangeResolutionDroptable(aspectratio_drop.value);
         aspectratio_drop.Hide();
-        //print(aspectratio_drop.captionText.text);
     }
 
     private void ChangeResolutionDroptable(int index, int res_ind = 0) 
@@ -188,8 +182,6 @@ public class ChangeGraphicsSettings : MonoBehaviour
         GraphicSettings.ScreenResolutionWidth = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value].x;
         GraphicSettings.ScreenResolutionHeight = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value].y;
 
-        //set_to_resol = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value];
-        //print(set_to_resol);
     }
 
     public void OnResolutionChange() 
@@ -198,7 +190,6 @@ public class ChangeGraphicsSettings : MonoBehaviour
             Vector2Int res = ratio_to_res[aspectratio_drop.value][screenresolution_drop.value];
             GraphicSettings.ScreenResolutionWidth = res.x;
             GraphicSettings.ScreenResolutionHeight = res.y;
-            //Screen.SetResolution(res.x, res.y, fullscreenmode_drop.value != 2);
         }
         SettingsWasChanged = true;
 

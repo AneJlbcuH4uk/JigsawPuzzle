@@ -196,7 +196,6 @@ public class JournalData
             if (_is_file_image(file.Name))
             {
                 var temp = new PuzzleData(Path.Combine(path, file.Name), MaskType.Classic, 4, 5);
-                //Debug.Log(Path.Combine(path, file.Name));
                 puzzles.Add(temp);
             }
         }

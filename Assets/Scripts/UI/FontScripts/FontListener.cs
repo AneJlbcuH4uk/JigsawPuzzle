@@ -19,10 +19,4 @@ public class FontListener : MonoBehaviour
         FontManager.GetInstance().UppdateFontForEnabled();
     }
 
-    //private void Start()
-    //{
-    //    fm.Addlabellistener(gameObject);
-    //}
-
-
 }

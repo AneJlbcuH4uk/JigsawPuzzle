@@ -34,7 +34,6 @@ public class JournalRef : MonoBehaviour
                     if (uiBehaviour != null)
                     {
                         uiBehaviour.UpdateJournal(Journal, isOn);
-                        //print("updating state");
                     }
                     else
                     {

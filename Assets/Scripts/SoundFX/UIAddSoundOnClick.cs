@@ -16,24 +16,21 @@ public class UIAddSoundOnClick : MonoBehaviour
     void Awake()
     {
         clip_backup = clip;
-        try 
+
+        button = GetComponent<Button>();
+        toggle = GetComponent<Toggle>();
+
+        if (button != null)
         {
-            button = gameObject.GetComponent<Button>();
             button.onClick.AddListener(() => SoundFXManager.instance.PlaySoundClipOnClick(clip));
         }
-        catch 
+        else if (toggle != null)
         {
-            
-        }
-
-        try 
-        {
-            toggle = gameObject.GetComponent<Toggle>();
             toggle.onValueChanged.AddListener((bool val) => SoundFXManager.instance.PlaySoundClipOnClick(clip));
         }
-        catch 
+        else
         {
-
+            Debug.LogError($"{name} must have either a Button or Toggle component attached!", this);
         }
     }
 
