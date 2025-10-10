@@ -16,6 +16,10 @@ The goal was to create a complete, stable, and enjoyable game experience while l
 
 You can try the game using one of the following builds:
 
+-  [Windows Build (GitHub Release)](https://github.com/AneJlbcuH4uk/JigsawPuzzle/releases/download/1.0.0/Windows.Build.rar)
+-  [Linux Build (GitHub Release)](https://github.com/AneJlbcuH4uk/JigsawPuzzle/releases/download/1.0.0/Linux.Build.rar)
+
+---
 
 ## ✨ Features
 
@@ -28,7 +32,10 @@ You can try the game using one of the following builds:
 
 ## 🧩 Screenshots
 
-
+<img width="1680" height="1050" alt="image" src="https://github.com/user-attachments/assets/e336767e-d37d-43c1-943a-cc1402be1dd7" />
+<img width="1680" height="1050" alt="image" src="https://github.com/user-attachments/assets/5ad337be-78bc-4e7c-952a-e1adeb6535f0" />
+<img width="1680" height="1050" alt="image" src="https://github.com/user-attachments/assets/c42e226a-e241-45ec-a46f-50fad2322c7f" />
+<img width="1680" height="1050" alt="image" src="https://github.com/user-attachments/assets/750395be-4c5c-42a9-9daf-a39999c94125" />
 
 ---
 
