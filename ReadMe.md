@@ -63,7 +63,7 @@ Personal discoveries and bigges bugfixes during development:
 
 **Kovalchenko Andrii**  
 Unity Developer | Mathematics Graduate  
-📧 [Email]()
+📧 [Email](MrBusinessDeluxe@gmail.com)
 🌐 [GitHub](https://github.com/AneJlbcuH4uk)
 
 ---
